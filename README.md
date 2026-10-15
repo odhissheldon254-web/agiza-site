@@ -6,13 +6,10 @@ Agiza's personal website: one page, plain HTML, hosted free on Cloudflare Pages.
 
 | Placeholder | Replace with | Example |
 |---|---|---|
-| `2547XXXXXXXX` | WhatsApp number, international format, no + or spaces | 254712345678 |
-| `07XX XXX XXX` | Same number, the way Kenyans write it | 0712 345 678 |
 | `[XXXX]` | Her IRA licence number | |
-| `[Insurer name]` | The company she is an agent for, worded the way they approve | |
 | `Nairobi` | Her town, if it is not Nairobi (appears 4 times) | |
 
-The "Ask Agiza" chat bubble (bottom right) has its own copy of the number: change `const WHATSAPP = '2547XXXXXXXX'` near the end of `index.html`.
+The "Ask Agiza" chat bubble (bottom right) has its own copy of the number (now 254111349220, from her Prudential quote): change `const WHATSAPP` near the end of `index.html`.
 Its six replies are fixed text, listed together in the `QA` list just below that line. Have Agiza read them and approve every word before going live.
 
 Then add her photo as `images/agiza.jpg`: a portrait, about 800 x 1000 pixels, under 300 KB.

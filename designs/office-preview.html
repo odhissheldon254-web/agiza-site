@@ -104,6 +104,13 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .todo input:checked + label { text-decoration: line-through; color: var(--soft) }
 .todo small { display: block; color: var(--soft); font-size: 12px }
 .empty { padding: 20px 18px; color: var(--soft); font-size: 14px }
+.quote-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 14px 18px; border-top: 1px solid var(--line) }
+.quote-row:first-child { border-top: 0 }
+.quote-row p { color: var(--soft); font-size: 13px }
+.quote-row .amt { grid-column: 2; grid-row: 1 / span 2; text-align: right; font-family: var(--disp); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1 }
+.quote-row .amt small { display: block; font-family: var(--body); font-size: 11px; font-weight: 400; color: var(--soft) }
+.quote-row .pill { justify-self: start; margin-top: 6px }
+.panel-note { color: var(--soft); font-size: 13px; margin-top: 8px }
 
 @media (max-width: 900px) {
   .login { grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-height: 0 }
@@ -209,6 +216,16 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
             <button type="button" aria-pressed="false" data-f="done">Covered</button>
           </div>
           <div class="list" id="clients"></div>
+        </section>
+
+        <section class="panel">
+          <h2>Quotes sent <button class="add" type="button">+ New quote</button></h2>
+          <div class="list">
+            <div class="quote-row"><div><b>Brian O.</b><p>PRULife Whole Life · KES 3,000,000 cover · pay 10 yrs · sent 14 Oct</p></div><div class="amt">2,925<small>KES / month</small></div><span class="pill quote">Call today 13:30</span></div>
+            <div class="quote-row"><div><b>James &amp; Ruth N.</b><p>Family life cover · KES 5,000,000 · sent 9 Oct</p></div><div class="amt">4,180<small>KES / month</small></div><span class="pill new">Follow up Mon</span></div>
+            <div class="quote-row"><div><b>Peter M.</b><p>PRULife Whole Life · KES 1,000,000 · sent 25 Sep</p></div><div class="amt">1,240<small>KES / month</small></div><span class="pill done">Accepted</span></div>
+          </div>
+          <p class="panel-note">Each row links to the Prudential quote PDF she sent, so she can resend it in one tap.</p>
         </section>
       </div>
 
