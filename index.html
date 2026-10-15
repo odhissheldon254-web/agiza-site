@@ -105,17 +105,37 @@ h2 { font-family: var(--disp); font-weight: 500; font-size: clamp(34px, 4.5vw, 5
 .faq summary { font-family: var(--disp); font-size: 22px; font-weight: 600; cursor: pointer }
 .faq details p { margin-top: 10px; color: var(--soft); max-width: 65ch }
 
-footer { background: var(--ink); color: var(--paper); padding-block: 72px 32px; scroll-margin-top: 20px }
+footer { background: var(--ink); color: var(--paper); padding-block: 72px 96px; scroll-margin-top: 20px }
 footer .grid { grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: end }
 footer .contact { color: var(--mist); margin-top: 10px }
 footer .contact a { text-decoration: none; border-bottom: 1px solid var(--gold) }
 footer .btn.pri { background: var(--paper); color: var(--ink) }
-footer .small { font-size: 13px; color: #bfa9bd; margin-top: 40px; border-top: 1px solid #4a3050; padding-top: 18px; padding-right: 64px }
+footer .small { font-size: 13px; color: #bfa9bd; margin-top: 40px; border-top: 1px solid #4a3050; padding-top: 18px }
 
-/* Floating WhatsApp button, always within reach on phones */
-.wa { position: fixed; right: max(18px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 10;
-  width: 56px; height: 56px; border-radius: 50%; background: #25d366; display: grid; place-items: center; box-shadow: 0 8px 22px -6px rgba(0,0,0,.35) }
-.wa svg { width: 30px; height: 30px; fill: #fff }
+/* "Ask Agiza" helper: tap a question, read her approved answer, continue on WhatsApp. No AI, no cost. */
+.helper { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 10;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 12px }
+.launch { display: flex; align-items: center; gap: 10px; border: 0; cursor: pointer; font: 500 15px var(--body); color: var(--paper);
+  background: var(--ink); padding: 8px 18px 8px 8px; border-radius: 40px; box-shadow: 0 10px 26px -8px rgba(45,22,48,.55) }
+.launch .av { width: 40px; height: 40px; border-radius: 50%; background: var(--rose); display: grid; place-items: center; font: 600 22px var(--disp) }
+.launch[aria-expanded="true"] .lbl-open, .launch[aria-expanded="false"] .lbl-close { display: none }
+.panel { width: min(360px, calc(100vw - 32px)); max-height: min(560px, calc(100dvh - 110px)); display: flex; flex-direction: column;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 24px 50px -16px rgba(45,22,48,.45) }
+.panel[hidden] { display: none }
+.panel header { background: var(--ink); color: var(--paper); padding: 16px 18px }
+.panel header b { font: 600 22px var(--disp); display: block }
+.panel header small { color: var(--mist); font-size: 13px }
+.log { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px }
+.msg { max-width: 88%; padding: 10px 14px; border-radius: 14px; font-size: 15px; line-height: 1.5 }
+.msg.her { background: var(--blush); border-bottom-left-radius: 4px; align-self: flex-start }
+.msg.you { background: var(--ink); color: var(--paper); border-bottom-right-radius: 4px; align-self: flex-end }
+.msg a.go { display: inline-block; margin-top: 10px; background: #1f9d55; color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 20px; font-weight: 500; font-size: 14px }
+.chips { flex: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px 16px; border-top: 1px solid var(--line) }
+.chips button { font: 500 14px var(--body); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 7px 13px; cursor: pointer }
+.chips button:hover { border-color: var(--rose); color: var(--rose) }
+.chips.row { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none }
+.chips.row button { flex: none }
+@media (prefers-reduced-motion: no-preference) { .panel { animation: rise .2s ease } @keyframes rise { from { opacity: 0; transform: translateY(8px) } } }
 
 @media (max-width: 860px) {
   .hero, .about .grid, .faq .grid, footer .grid { grid-template-columns: 1fr }
@@ -225,10 +245,64 @@ footer .small { font-size: 13px; color: #bfa9bd; margin-top: 40px; border-top: 1
   <p class="small">Lorrain Agiza Odungu · Licensed insurance agent, IRA licence no. [XXXX] · [Insurer name]. Plan terms are set out in the insurer's official documents. © <span id="yr">2026</span></p>
 </div></footer>
 
-<a class="wa" href="https://wa.me/2547XXXXXXXX?text=Hi%20Agiza%2C%20I%20saw%20your%20website%20and%20I%27d%20like%20to%20ask%20about%20insurance." target="_blank" rel="noopener" aria-label="Chat with Agiza on WhatsApp">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2s.2-1.1.2-1.2-.2-.2-.5-.3z"/></svg>
-</a>
+<div class="helper">
+  <div class="panel" id="helper-panel" role="dialog" aria-label="Ask Agiza" hidden>
+    <header><b>Ask Agiza</b><small>Quick answers. For your own figures, chat with me on WhatsApp.</small></header>
+    <div class="log" id="helper-log" aria-live="polite"></div>
+    <div class="chips" id="helper-chips"></div>
+  </div>
+  <button class="launch" id="helper-btn" aria-expanded="false" aria-controls="helper-panel">
+    <span class="av" aria-hidden="true">A</span><span class="lbl-open">Ask Agiza</span><span class="lbl-close">Close</span>
+  </button>
+</div>
 
-<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+<script>
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+// "Ask Agiza" helper. Every answer below is fixed text Agiza has approved; nothing is generated.
+// To change a reply, edit it here. WHATSAPP is the same number as the buttons above.
+const WHATSAPP = '2547XXXXXXXX';
+const QA = [
+  { q: 'How much does cover cost?', a: "It depends on your age, how much cover you want and the plan. Tell me a little about yourself on WhatsApp and I'll send you real monthly figures.", wa: 'Hi Agiza, how much would cover cost for me?' },
+  { q: 'Which plan suits me?', a: "Most people start with life cover to protect family, or an education plan for their children's fees. In a free 20-minute chat I'll compare two or three options for you side by side.", wa: "Hi Agiza, I'd like help choosing a plan." },
+  { q: 'Can I pay by M-Pesa?', a: "Yes, premiums can be paid through M-Pesa. I'll show you how when we set up your plan.", wa: 'Hi Agiza, I have a question about paying by M-Pesa.' },
+  { q: 'Do we have to meet?', a: 'No. We can do everything on WhatsApp and a phone call, or meet in person if you prefer.', wa: "Hi Agiza, I'd like to talk about insurance." },
+  { q: 'Help with a claim', a: "I'm sorry you're going through this. Message me and I'll walk you through every step of the claim.", wa: 'Hi Agiza, I need help with a claim.' },
+  { q: 'Something else', a: "Of course. Send me your question on WhatsApp and I'll reply personally.", wa: 'Hi Agiza, I saw your website and I have a question.' }
+];
+(() => {
+  const btn = document.getElementById('helper-btn'), panel = document.getElementById('helper-panel'),
+        log = document.getElementById('helper-log'), chips = document.getElementById('helper-chips');
+  const say = (who, text, waText) => {
+    const m = document.createElement('div');
+    m.className = 'msg ' + who;
+    m.textContent = text;
+    if (waText) {
+      const a = document.createElement('a');
+      a.className = 'go'; a.target = '_blank'; a.rel = 'noopener';
+      a.href = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(waText);
+      a.textContent = 'Continue on WhatsApp';
+      m.append(document.createElement('br'), a);
+    }
+    log.append(m);
+    return m;
+  };
+  say('her', "Hi, I'm Agiza. Tap a question below, or message me directly.");
+  QA.forEach(item => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = item.q;
+    b.onclick = () => {
+      chips.classList.add('row');
+      const asked = say('you', item.q);
+      say('her', item.a, item.wa);
+      log.scrollTop = asked.offsetTop - log.offsetTop - 12;
+    };
+    chips.append(b);
+  });
+  const toggle = open => { panel.hidden = !open; btn.setAttribute('aria-expanded', open); };
+  btn.onclick = () => toggle(panel.hidden);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !panel.hidden) { toggle(false); btn.focus(); } });
+})();
+</script>
 </body>
 </html>
