@@ -6,7 +6,6 @@ Agiza's personal website: one page, plain HTML, hosted free on Cloudflare Pages.
 
 | Placeholder | Replace with | Example |
 |---|---|---|
-| `[Surname]` | Her surname | Wanjiku |
 | `2547XXXXXXXX` | WhatsApp number, international format, no + or spaces | 254712345678 |
 | `07XX XXX XXX` | Same number, the way Kenyans write it | 0712 345 678 |
 | `[XXXX]` | Her IRA licence number | |
