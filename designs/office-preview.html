@@ -1,0 +1,292 @@
+<title>Agiza Office</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap">
+<style>
+/* Layout: login card on a split screen; after sign-in, a single-column office dashboard that widens to two columns. Matches the Elegant public site. */
+:root {
+  --ink: #2d1630; --paper: #fbf3f2; --card: #ffffff; --blush: #f3dcdc; --rose: #a8455f; --gold: #b08a4a; --soft: #6e5a70; --line: #ead7da; --mist: #e3d2df;
+  --ok: #2f7a5b; --ok-bg: #e2f1ea; --warn: #9a6412; --warn-bg: #fbeedb;
+  --disp: "Cormorant Garamond", Georgia, serif; --body: "Jost", system-ui, sans-serif;
+}
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+html, body { height: 100% }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55 }
+h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 500 }
+p { margin: 0 }
+button, input { font: inherit; color: inherit }
+:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px }
+.sample { background: var(--ink); color: var(--mist); font-size: 12px; text-align: center; padding-block: 6px; letter-spacing: .04em;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+
+/* ---------- Login ---------- */
+.login { min-height: calc(100% - 30px); display: grid; grid-template-columns: 1fr 1fr }
+.login .art { background: var(--ink); color: var(--paper); padding: 56px; display: flex; flex-direction: column; justify-content: space-between; gap: 40px; position: relative; overflow: hidden }
+.login .art::before { content: ""; position: absolute; width: 420px; height: 520px; right: -120px; bottom: -160px; border: 1px solid var(--gold); border-radius: 220px 220px 0 0; opacity: .6 }
+.login .art::after { content: ""; position: absolute; width: 420px; height: 520px; right: -90px; bottom: -190px; background: #3b2140; border-radius: 220px 220px 0 0 }
+.login .art > * { position: relative; z-index: 1 }
+.logo { font-family: var(--disp); font-size: 30px; font-weight: 600 }
+.logo i { color: var(--rose) }
+.art .logo i { color: #e7a3b5 }
+.art h1 { font-family: var(--disp); font-size: clamp(38px, 4.6vw, 58px); line-height: 1.05; max-width: 12ch }
+.art h1 em { color: #e7a3b5 }
+.art p { color: var(--mist); max-width: 36ch }
+.login .form { display: grid; place-items: center; padding: 48px max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px)) }
+.card { width: 100%; max-width: 380px }
+.rule { height: 1px; width: 56px; background: var(--gold); margin-bottom: 16px }
+.card h2 { font-family: var(--disp); font-size: 38px; line-height: 1.1 }
+.card .sub { color: var(--soft); margin-block: 8px 28px }
+.g-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px; border: 1px solid var(--line); background: var(--card); border-radius: 3px; cursor: pointer; font-weight: 500 }
+.g-btn:hover { border-color: var(--soft) }
+.or { display: flex; align-items: center; gap: 12px; color: var(--soft); font-size: 12px; text-transform: uppercase; letter-spacing: .14em; margin-block: 22px }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line) }
+label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
+.field { width: 100%; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); border-radius: 3px }
+.field:focus { border-color: var(--rose); outline: none }
+.code { letter-spacing: .5em; font-size: 22px; text-align: center; font-variant-numeric: tabular-nums }
+.pri { width: 100%; margin-top: 14px; padding: 14px; background: var(--ink); color: var(--paper); border: 0; border-radius: 3px; cursor: pointer; font-weight: 500; letter-spacing: .02em }
+.pri:hover { background: #42234a }
+.hint { font-size: 13px; color: var(--soft); margin-top: 18px }
+.link { background: none; border: 0; padding: 0; color: var(--rose); cursor: pointer; text-decoration: underline; text-underline-offset: 3px }
+.err { color: var(--rose); font-size: 13px; margin-top: 8px }
+
+/* ---------- Office ---------- */
+.top { background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5 }
+.bar { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.bar .logo { font-size: 26px }
+.bar .logo small { font-family: var(--body); font-size: 12px; color: var(--soft); letter-spacing: .14em; text-transform: uppercase; margin-left: 8px; font-weight: 500 }
+.who { display: flex; align-items: center; gap: 10px; font-size: 14px }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--blush); color: var(--rose); display: grid; place-items: center; font-family: var(--disp); font-weight: 600; font-size: 18px }
+.ghost { background: none; border: 1px solid var(--line); border-radius: 3px; padding: 7px 12px; cursor: pointer; font-size: 13px }
+.page { max-width: 1180px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px }
+.hello h1 { font-family: var(--disp); font-size: clamp(32px, 4vw, 44px); line-height: 1.1 }
+.hello p { color: var(--soft); margin-top: 4px }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 18px 20px }
+.stat span { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--soft) }
+.stat b { display: block; font-family: var(--disp); font-size: 44px; font-weight: 500; line-height: 1.05; margin-top: 4px; font-variant-numeric: tabular-nums }
+.stat small { color: var(--soft); font-size: 13px }
+.stat.hi { background: var(--ink); border-color: var(--ink); color: var(--paper) }
+.stat.hi span, .stat.hi small { color: var(--mist) }
+.cols { display: grid; grid-template-columns: 1.5fr 1fr; gap: 28px; align-items: start }
+.cols > * { min-width: 0 }
+.panel h2 { font-family: var(--disp); font-size: 28px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px }
+.panel h2 button { font-family: var(--body); font-size: 13px }
+.add { background: var(--ink); color: var(--paper); border: 0; border-radius: 3px; padding: 7px 12px; cursor: pointer }
+.list { background: var(--card); border: 1px solid var(--line); border-radius: 4px }
+.item { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; padding: 14px 18px; border-top: 1px solid var(--line) }
+.item:first-child { border-top: 0 }
+.item > * { min-width: 0 }
+.time { font-family: var(--disp); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1 }
+.time small { display: block; font-family: var(--body); font-size: 11px; color: var(--soft); font-weight: 400; margin-top: 4px; text-transform: uppercase; letter-spacing: .1em }
+.item b { font-weight: 500 }
+.item p { color: var(--soft); font-size: 13px }
+.pill { font-size: 12px; padding: 4px 10px; border-radius: 99px; white-space: nowrap; font-weight: 500 }
+.pill.new { background: var(--blush); color: var(--rose) }
+.pill.quote { background: var(--warn-bg); color: var(--warn) }
+.pill.docs { background: #ece6f3; color: #5b4378 }
+.pill.done { background: var(--ok-bg); color: var(--ok) }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px }
+.tabs button { border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: 6px 12px; font-size: 13px; cursor: pointer }
+.tabs button[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper) }
+.client { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 14px 18px; border-top: 1px solid var(--line) }
+.client:first-child { border-top: 0 }
+.client p { color: var(--soft); font-size: 13px; grid-column: 1 }
+.client .pill { grid-row: 1 / span 2; grid-column: 2; align-self: center }
+.wa { color: var(--ok); font-size: 13px; text-decoration: none; font-weight: 500 }
+.todo { list-style: none; margin: 0; padding: 0 }
+.todo li { display: flex; gap: 12px; align-items: flex-start; padding: 13px 18px; border-top: 1px solid var(--line) }
+.todo li:first-child { border-top: 0 }
+.todo input { margin-top: 4px; accent-color: var(--rose); width: 16px; height: 16px }
+.todo label { font-weight: 400; margin: 0; font-size: 15px; cursor: pointer }
+.todo input:checked + label { text-decoration: line-through; color: var(--soft) }
+.todo small { display: block; color: var(--soft); font-size: 12px }
+.empty { padding: 20px 18px; color: var(--soft); font-size: 14px }
+
+@media (max-width: 900px) {
+  .login { grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-height: 0 }
+  .login .art::before, .login .art::after { display: none }
+  .login .art p:last-child { display: none }
+  .login .form { place-items: start center; padding-top: 36px }
+  .login .art { padding: 36px max(16px, env(safe-area-inset-right, 0px)) 36px max(16px, env(safe-area-inset-left, 0px)) }
+  .art .big { display: none }
+  .cols { grid-template-columns: 1fr }
+  .stats { grid-template-columns: repeat(2, 1fr) }
+  .who .name { display: none }
+}
+@media (prefers-reduced-motion: no-preference) { #office, #login { animation: fade .35s ease } @keyframes fade { from { opacity: .4 } to { opacity: 1 } } }
+</style>
+
+<div class="sample">DESIGN PREVIEW · every name, number and meeting below is sample data · any 6-digit code works</div>
+
+<!-- ================= LOGIN ================= -->
+<div id="login" class="login">
+  <div class="art">
+    <div class="logo">Agiza<i>.</i></div>
+    <div class="big">
+      <h1>Your clients, your day, <em>one place.</em></h1>
+      <p style="margin-top:16px">The private office for agiza.co.ke. Only Lorrain can sign in.</p>
+    </div>
+    <p style="font-size:13px">office.agiza.co.ke</p>
+  </div>
+  <div class="form">
+    <div class="card">
+      <!-- Step 1: email -->
+      <div id="step1">
+        <div class="rule"></div>
+        <h2>Welcome back, Agiza</h2>
+        <p class="sub">Sign in to your office.</p>
+        <button class="g-btn" id="google" type="button">
+          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
+          Continue with Google
+        </button>
+        <div class="or">or</div>
+        <form id="emailForm" novalidate>
+          <label for="email">Email address</label>
+          <input class="field" id="email" type="email" autocomplete="email" value="agiza@agiza.co.ke">
+          <p class="err" id="emailErr" hidden>Enter the email address you use for your office.</p>
+          <button class="pri" type="submit">Email me a sign-in code</button>
+        </form>
+        <p class="hint">No password to remember. We send a 6-digit code to your email each time you sign in.</p>
+      </div>
+      <!-- Step 2: code -->
+      <div id="step2" hidden>
+        <div class="rule"></div>
+        <h2>Check your email</h2>
+        <p class="sub">We sent a 6-digit code to <b id="sentTo">agiza@agiza.co.ke</b>. It expires in 10 minutes.</p>
+        <form id="codeForm" novalidate>
+          <label for="code">Sign-in code</label>
+          <input class="field code" id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
+          <p class="err" id="codeErr" hidden>The code is 6 digits. Check your email and try again.</p>
+          <button class="pri" type="submit">Open my office</button>
+        </form>
+        <p class="hint">Wrong email? <button class="link" id="back" type="button">Go back</button></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= OFFICE ================= -->
+<div id="office" hidden>
+  <header class="top"><div class="bar">
+    <div class="logo">Agiza<i>.</i><small>Office</small></div>
+    <div class="who"><span class="name">Lorrain Agiza Odungu</span><span class="avatar">A</span><button class="ghost" id="signout" type="button">Sign out</button></div>
+  </div></header>
+
+  <main class="page">
+    <div class="hello">
+      <h1 id="greet">Good morning, Agiza</h1>
+      <p id="today">Thursday, 15 October</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat hi"><span>Meetings today</span><b>3</b><small>next at 10:00</small></div>
+      <div class="stat"><span>Pending clients</span><b>7</b><small>2 waiting on you</small></div>
+      <div class="stat"><span>Covered this month</span><b>4</b><small>October</small></div>
+      <div class="stat"><span>Clients served</span><b>58</b><small>all time</small></div>
+    </div>
+
+    <div class="cols">
+      <div style="display:grid;gap:28px">
+        <section class="panel">
+          <h2>Today's meetings <button class="add" type="button">+ Add</button></h2>
+          <div class="list">
+            <div class="item"><div class="time">10:00<small>45 min</small></div><div><b>Grace W.</b><p>Education plan for 2 children · Sarit Centre café</p></div><span class="pill new">First chat</span></div>
+            <div class="item"><div class="time">13:30<small>30 min</small></div><div><b>Brian O.</b><p>Go through life cover quote · WhatsApp call</p></div><span class="pill quote">Quote sent</span></div>
+            <div class="item"><div class="time">16:00<small>1 hr</small></div><div><b>Branch team meeting</b><p>Monthly targets · Upper Hill office</p></div><span class="pill docs">Office</span></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Clients <button class="add" type="button">+ New client</button></h2>
+          <div class="tabs" role="group" aria-label="Filter clients">
+            <button type="button" aria-pressed="true" data-f="all">All pending · 7</button>
+            <button type="button" aria-pressed="false" data-f="new">New · 3</button>
+            <button type="button" aria-pressed="false" data-f="quote">Quote sent · 2</button>
+            <button type="button" aria-pressed="false" data-f="docs">Waiting for documents · 2</button>
+            <button type="button" aria-pressed="false" data-f="done">Covered</button>
+          </div>
+          <div class="list" id="clients"></div>
+        </section>
+      </div>
+
+      <div style="display:grid;gap:28px">
+        <section class="panel">
+          <h2>To do</h2>
+          <ul class="list todo">
+            <li><input type="checkbox" id="t1"><label for="t1">Send Brian the revised quote<small>Before 13:30 call</small></label></li>
+            <li><input type="checkbox" id="t2"><label for="t2">Collect ID copy from Mercy K.<small>Waiting 3 days</small></label></li>
+            <li><input type="checkbox" id="t3" checked><label for="t3">Post on WhatsApp status about education plans<small>Done this morning</small></label></li>
+            <li><input type="checkbox" id="t4"><label for="t4">Remind Peter M. his premium is due<small>Due 20 October</small></label></li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <h2>This week</h2>
+          <div class="list">
+            <div class="item"><div class="time">Fri<small>16 Oct</small></div><div><b>Mercy K.</b><p>Sign forms · her office, Westlands</p></div><span class="pill docs">Documents</span></div>
+            <div class="item"><div class="time">Sat<small>17 Oct</small></div><div><b>Church fellowship talk</b><p>"Planning for your children's fees"</p></div><span class="pill new">Event</span></div>
+            <div class="item"><div class="time">Mon<small>19 Oct</small></div><div><b>James & Ruth N.</b><p>Family life cover review</p></div><span class="pill quote">Quote sent</span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id) };
+  var clients = [
+    { n: 'Grace W.', d: 'Education plan · met at church event', s: 'new', l: 'New' },
+    { n: 'Kevin A.', d: 'Life cover · referred by Brian O.', s: 'new', l: 'New' },
+    { n: 'Faith M.', d: 'Savings plan · asked on the website', s: 'new', l: 'New' },
+    { n: 'Brian O.', d: 'Life cover · quote sent 12 Oct', s: 'quote', l: 'Quote sent' },
+    { n: 'James & Ruth N.', d: 'Family life cover · quote sent 9 Oct', s: 'quote', l: 'Quote sent' },
+    { n: 'Mercy K.', d: 'Education plan · needs ID copy', s: 'docs', l: 'Documents' },
+    { n: 'Daniel O.', d: 'Health cover · needs KRA PIN', s: 'docs', l: 'Documents' },
+    { n: 'Peter M.', d: 'Life cover · covered 2 Oct', s: 'done', l: 'Covered' },
+    { n: 'Esther J.', d: 'Education plan · covered 6 Oct', s: 'done', l: 'Covered' }
+  ];
+  function render(f) {
+    var rows = clients.filter(function (c) { return f === 'all' ? c.s !== 'done' : c.s === f });
+    $('clients').innerHTML = rows.map(function (c) {
+      return '<div class="client"><b>' + c.n + '</b><p>' + c.d + ' · <a class="wa" href="#" onclick="return false">WhatsApp</a></p><span class="pill ' + c.s + '">' + c.l + '</span></div>';
+    }).join('') || '<p class="empty">No clients here yet.</p>';
+  }
+  document.querySelectorAll('.tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.tabs button').forEach(function (x) { x.setAttribute('aria-pressed', x === b) });
+      render(b.dataset.f);
+    });
+  });
+  render('all');
+
+  var d = new Date(), h = d.getHours();
+  $('greet').textContent = (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ', Agiza';
+  $('today').textContent = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  function openOffice() { $('login').hidden = true; $('office').hidden = false; window.scrollTo(0, 0) }
+  $('google').addEventListener('click', openOffice);
+  $('emailForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('email').value.trim();
+    var bad = !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+    $('emailErr').hidden = !bad;
+    if (bad) return;
+    $('sentTo').textContent = v; $('step1').hidden = true; $('step2').hidden = false; $('code').focus();
+  });
+  $('codeForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var ok = /^\d{6}$/.test($('code').value.trim());
+    $('codeErr').hidden = ok;
+    if (ok) openOffice();
+  });
+  $('back').addEventListener('click', function () { $('step2').hidden = true; $('step1').hidden = false });
+  $('signout').addEventListener('click', function () {
+    $('office').hidden = true; $('login').hidden = false; $('step2').hidden = true; $('step1').hidden = false; $('code').value = ''; window.scrollTo(0, 0);
+  });
+})();
+</script>
