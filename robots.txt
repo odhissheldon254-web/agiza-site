@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://agiza.co.ke/sitemap.xml
