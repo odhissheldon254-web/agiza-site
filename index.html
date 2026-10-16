@@ -7,6 +7,7 @@
 <meta name="description" content="Lorrain Agiza Odungu is a licensed Prudential life insurance agent in Nairobi. Life cover, education, savings and health plans explained in plain language. Chat on WhatsApp for a free consultation.">
 <link rel="canonical" href="https://agiza.co.ke/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="images/icon-180.png">
 <meta name="theme-color" content="#2d1630">
 
 <!-- How the link looks when shared on WhatsApp, Facebook, etc. -->
@@ -139,16 +140,24 @@ footer .small { font-size: 13px; color: #bfa9bd; margin-top: 40px; border-top: 1
 @media (prefers-reduced-motion: no-preference) { .panel { animation: rise .2s ease } @keyframes rise { from { opacity: 0; transform: translateY(8px) } } }
 
 @media (max-width: 860px) {
-  .hero, .about .grid, .faq .grid, footer .grid { grid-template-columns: 1fr }
-  .hero { gap: 48px }
+  .about .grid, .faq .grid, footer .grid { grid-template-columns: 1fr }
+  .hero { gap: 32px; grid-template-columns: 1fr 1fr }
   .plans .grid { grid-template-columns: repeat(2, 1fr) }
   .plan:nth-child(3) { padding-left: 0; border-left: 0 }
   .steps ol { grid-template-columns: 1fr }
-  nav ul { display: none }
-  .frame { max-width: 340px; margin-left: 12px }
+  /* Phones and tablets: the section links become one swipeable row under the logo */
+  nav ul { order: 3; width: 100%; flex-wrap: nowrap; overflow-x: auto; gap: 8px; scrollbar-width: none; margin-inline: -2px; padding: 2px }
+  nav ul::-webkit-scrollbar { display: none }
+  nav ul a { display: block; white-space: nowrap; padding: 8px 14px; border: 1px solid var(--line); border-radius: 99px; background: #fff }
   section { padding-block: 56px }
 }
+@media (max-width: 700px) {
+  .hero { grid-template-columns: 1fr; padding-block: 16px 64px }
+  /* Keep the portrait from filling a whole phone screen */
+  .frame { width: min(260px, 72vw); margin: 4px auto 0 }
+}
 @media (max-width: 520px) {
+  .ctas .btn { flex: 1 1 100%; text-align: center; padding-block: 16px }
   .plans .grid { grid-template-columns: 1fr }
   .plan, .plan + .plan { padding-left: 0; border-left: 0 }
 }
@@ -242,7 +251,7 @@ footer .small { font-size: 13px; color: #bfa9bd; margin-top: 40px; border-top: 1
     </div>
     <div class="ctas"><a class="btn pri" href="https://wa.me/254111349220?text=Hi%20Agiza%2C%20I%20saw%20your%20website%20and%20I%27d%20like%20to%20ask%20about%20insurance." target="_blank" rel="noopener">Message on WhatsApp</a></div>
   </div>
-  <p class="small">Lorrain Agiza Odungu · Licensed insurance agent, IRA licence no. [XXXX] · Agent of Prudential Life Assurance Kenya Limited. Plan terms are set out in the insurer's official documents. © <span id="yr">2026</span></p>
+  <p class="small">Lorrain Agiza Odungu · Licensed insurance agent, IRA licence no. [XXXX] · Agent of Prudential Life Assurance Kenya Limited. Plan terms are set out in the insurer's official documents. © <span id="yr">2026</span> · <a href="office/">Office sign-in</a></p>
 </div></footer>
 
 <div class="helper">
