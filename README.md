@@ -35,3 +35,17 @@ Until the photo is there, the page shows a soft pink placeholder.
 - **Google Search Console:** add `agiza.co.ke`, then submit `https://agiza.co.ke/sitemap.xml`.
 - **Google Business Profile:** create one for her with the website link, so she shows up on Maps.
 - **Campaign material:** print `agiza.co.ke` and a QR code to it on posters and flyers.
+
+## 5. Agiza's office (agiza.odhis.co.ke/office/)
+
+The office saves to a free Supabase database. Until `office/config.js` is filled in, it runs as a demo with sample data.
+
+1. Sign up at supabase.com, create a project (free plan, region closest to Kenya), and save the database password somewhere safe.
+2. **SQL Editor, New query:** paste all of `supabase/setup.sql`, then Run. This creates her tables, the private PDF folder and the locks.
+3. **Authentication, Sign In / Providers:** under Email, keep it enabled and switch **"Allow new users to sign up" OFF**.
+4. **Authentication, Users, Add user, Create new user:** enter Agiza's email and tick "Auto confirm". (No password needed.)
+5. **Authentication, Emails, Magic Link template:** add `Your sign-in code: {{ .Token }}` to the message, so the email contains the 6-digit code.
+6. **Authentication, URL Configuration:** set Site URL to `https://agiza.odhis.co.ke/office/`.
+7. **Project Settings, API:** copy the Project URL and the `anon` public key into `office/config.js`, then push.
+
+Supabase's free built-in email only sends to members of your Supabase team, a few times an hour. Invite Agiza's email under Organization, Team (or create the account with her email). She stays signed in on her phone, so she rarely needs a new code.

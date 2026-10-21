@@ -25,9 +25,9 @@ html, body { height: 100% }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55 }
 h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 500 }
 p { margin: 0 }
-button, input { font: inherit; color: inherit }
+button, input, select, textarea { font: inherit; color: inherit }
 :focus-visible { outline: 2px solid var(--rose); outline-offset: 2px }
-.sample { background: var(--ink); color: var(--mist); font-size: 12px; text-align: center; padding-block: 6px; letter-spacing: .04em;
+.sample { position: relative; z-index: 6; background: var(--ink); color: var(--mist); font-size: 12px; text-align: center; padding-block: 6px; letter-spacing: .04em;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
 
 /* ---------- Login ---------- */
@@ -52,7 +52,7 @@ button, input { font: inherit; color: inherit }
 .or { display: flex; align-items: center; gap: 12px; color: var(--soft); font-size: 12px; text-transform: uppercase; letter-spacing: .14em; margin-block: 22px }
 .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line) }
 label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
-.field { width: 100%; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); border-radius: 3px }
+.field { width: 100%; font-size: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); border-radius: 3px }
 .field:focus { border-color: var(--rose); outline: none }
 .code { letter-spacing: .5em; font-size: 22px; text-align: center; font-variant-numeric: tabular-nums }
 .pri { width: 100%; margin-top: 14px; padding: 14px; background: var(--ink); color: var(--paper); border: 0; border-radius: 3px; cursor: pointer; font-weight: 500; letter-spacing: .02em }
@@ -134,51 +134,84 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
   .who .name { display: none }
 }
 @media (prefers-reduced-motion: no-preference) { #office, #login { animation: fade .35s ease } @keyframes fade { from { opacity: .4 } to { opacity: 1 } } }
+
+/* ---------- Live office additions ---------- */
+.item, .client, .quote-row { cursor: pointer }
+.item:hover, .client:hover, .quote-row:hover { background: #fdf8f8 }
+.wa, .pdf { color: var(--ok); font-size: 13px; text-decoration: none; font-weight: 500; background: none; border: 0; padding: 0; cursor: pointer }
+.pdf { color: var(--rose) }
+.pill.follow { background: var(--blush); color: var(--rose) }
+.pill.waiting { background: var(--warn-bg); color: var(--warn) }
+.pill.accepted { background: var(--ok-bg); color: var(--ok) }
+.pill.declined, .pill.past { background: #eee8ec; color: var(--soft) }
+.pill.office, .pill.event { background: #ece6f3; color: #5b4378 }
+.todo li label { flex: 1 }
+.todo .edit { background: none; border: 0; color: var(--soft); cursor: pointer; font-size: 13px; padding: 2px 4px }
+.quick { display: flex; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--line) }
+.quick input { flex: 1; min-width: 0; padding: 9px 12px; font-size: 16px; border: 1px solid var(--line); border-radius: 3px; background: var(--paper) }
+.quick button { flex: none }
+.more { display: block; width: 100%; padding: 10px; background: none; border: 0; border-top: 1px solid var(--line); color: var(--soft); font-size: 13px; cursor: pointer }
+
+dialog.sheet { border: 0; padding: 0; width: min(520px, calc(100% - 32px)); max-height: 92dvh; border-radius: 8px; background: var(--paper); color: var(--ink); box-shadow: 0 30px 60px -20px rgba(45,22,48,.5) }
+dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
+.sheet form { display: grid; gap: 14px; padding: 22px 22px calc(22px + env(safe-area-inset-bottom, 0px)) }
+.sheet h2 { font-family: var(--disp); font-size: 30px; display: flex; justify-content: space-between; align-items: center }
+.sheet h2 button { font-family: var(--body); font-size: 22px; line-height: 1; background: none; border: 0; cursor: pointer; color: var(--soft); padding: 4px 8px }
+.sheet label { margin-bottom: 4px }
+.sheet .field { padding: 11px 12px }
+.sheet textarea.field { min-height: 76px; resize: vertical }
+.sheet .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.sheet .row2 > * { min-width: 0 }
+.sheet .actions { display: flex; gap: 10px; align-items: center; margin-top: 4px }
+.sheet .actions .pri { margin: 0; width: auto; flex: 1 }
+.sheet .del { background: none; border: 1px solid var(--line); color: var(--rose); border-radius: 3px; padding: 13px 14px; cursor: pointer }
+.sheet .del.sure { background: var(--rose); color: #fff; border-color: var(--rose) }
+.sheet .note { font-size: 13px; color: var(--soft) }
+@media (max-width: 600px) {
+  dialog.sheet { width: 100%; max-width: 100%; margin: auto 0 0; border-radius: 14px 14px 0 0 }
+}
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 50; background: var(--ink); color: var(--paper);
+  padding: 11px 18px; border-radius: 6px; font-size: 14px; max-width: calc(100% - 32px); box-shadow: 0 10px 30px -10px rgba(0,0,0,.4) }
+.toast.bad { background: var(--rose) }
+.busy { opacity: .6; pointer-events: none }
 </style>
 </head>
 <body>
 
-<div class="sample">DESIGN PREVIEW · every name, number and meeting below is sample data · any 6-digit code works</div>
+<div class="sample" id="demoBar" hidden>DEMO · sample data only, nothing is saved · any 6-digit code works</div>
 
 <!-- ================= LOGIN ================= -->
-<div id="login" class="login">
+<div id="login" class="login" hidden>
   <div class="art">
     <div class="logo">Agiza<i>.</i></div>
     <div class="big">
       <h1>Your clients, your day, <em>one place.</em></h1>
-      <p style="margin-top:16px">The private office for agiza.co.ke. Only Lorrain can sign in.</p>
+      <p style="margin-top:16px">Lorrain's private office. Only she can sign in.</p>
     </div>
-    <p style="font-size:13px">office.agiza.co.ke</p>
+    <p style="font-size:13px">Agiza Office</p>
   </div>
   <div class="form">
     <div class="card">
-      <!-- Step 1: email -->
       <div id="step1">
         <div class="rule"></div>
         <h2>Welcome back, Agiza</h2>
         <p class="sub">Sign in to your office.</p>
-        <button class="g-btn" id="google" type="button">
-          <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
-          Continue with Google
-        </button>
-        <div class="or">or</div>
         <form id="emailForm" novalidate>
           <label for="email">Email address</label>
-          <input class="field" id="email" type="email" autocomplete="email" value="agiza@agiza.co.ke">
-          <p class="err" id="emailErr" hidden>Enter the email address you use for your office.</p>
+          <input class="field" id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@gmail.com">
+          <p class="err" id="emailErr" hidden></p>
           <button class="pri" type="submit">Email me a sign-in code</button>
         </form>
-        <p class="hint">No password to remember. We send a 6-digit code to your email each time you sign in.</p>
+        <p class="hint">No password to remember. We email you a code, and this phone stays signed in.</p>
       </div>
-      <!-- Step 2: code -->
       <div id="step2" hidden>
         <div class="rule"></div>
         <h2>Check your email</h2>
-        <p class="sub">We sent a 6-digit code to <b id="sentTo">agiza@agiza.co.ke</b>. It expires in 10 minutes.</p>
+        <p class="sub">We sent a sign-in code to <b id="sentTo"></b>. It expires in an hour.</p>
         <form id="codeForm" novalidate>
           <label for="code">Sign-in code</label>
-          <input class="field code" id="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
-          <p class="err" id="codeErr" hidden>The code is 6 digits. Check your email and try again.</p>
+          <input class="field code" id="code" inputmode="numeric" maxlength="10" autocomplete="one-time-code" placeholder="••••••">
+          <p class="err" id="codeErr" hidden></p>
           <button class="pri" type="submit">Open my office</button>
         </form>
         <p class="hint">Wrong email? <button class="link" id="back" type="button">Go back</button></p>
@@ -196,127 +229,446 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 
   <main class="page">
     <div class="hello">
-      <h1 id="greet">Good morning, Agiza</h1>
-      <p id="today">Thursday, 15 October</p>
+      <h1 id="greet">Hello, Agiza</h1>
+      <p id="today"></p>
     </div>
 
     <div class="stats">
-      <div class="stat hi"><span>Meetings today</span><b>3</b><small>next at 10:00</small></div>
-      <div class="stat"><span>Pending clients</span><b>7</b><small>2 waiting on you</small></div>
-      <div class="stat"><span>Covered this month</span><b>4</b><small>October</small></div>
-      <div class="stat"><span>Clients served</span><b>58</b><small>all time</small></div>
+      <div class="stat hi"><span>Meetings today</span><b id="sToday">0</b><small id="sTodayNext">&nbsp;</small></div>
+      <div class="stat"><span>Pending clients</span><b id="sPending">0</b><small id="sPendingNew">&nbsp;</small></div>
+      <div class="stat"><span>Covered this month</span><b id="sMonth">0</b><small id="sMonthName">&nbsp;</small></div>
+      <div class="stat"><span>Clients served</span><b id="sAll">0</b><small>all time</small></div>
     </div>
 
     <div class="cols">
       <div style="display:grid;gap:28px">
         <section class="panel">
-          <h2>Today's meetings <button class="add" type="button">+ Add</button></h2>
-          <div class="list">
-            <div class="item"><div class="time">10:00<small>45 min</small></div><div><b>Grace W.</b><p>Education plan for 2 children · Sarit Centre café</p></div><span class="pill new">First chat</span></div>
-            <div class="item"><div class="time">13:30<small>30 min</small></div><div><b>Brian O.</b><p>Go through life cover quote · WhatsApp call</p></div><span class="pill quote">Quote sent</span></div>
-            <div class="item"><div class="time">16:00<small>1 hr</small></div><div><b>Branch team meeting</b><p>Monthly targets · Upper Hill office</p></div><span class="pill docs">Office</span></div>
-          </div>
+          <h2>Today's meetings <button class="add" type="button" data-new="meetings">+ Add</button></h2>
+          <div class="list" id="todayList"></div>
         </section>
 
         <section class="panel">
-          <h2>Clients <button class="add" type="button">+ New client</button></h2>
-          <div class="tabs" role="group" aria-label="Filter clients">
-            <button type="button" aria-pressed="true" data-f="all">All pending · 7</button>
-            <button type="button" aria-pressed="false" data-f="new">New · 3</button>
-            <button type="button" aria-pressed="false" data-f="quote">Quote sent · 2</button>
-            <button type="button" aria-pressed="false" data-f="docs">Waiting for documents · 2</button>
-            <button type="button" aria-pressed="false" data-f="done">Covered</button>
-          </div>
-          <div class="list" id="clients"></div>
+          <h2>Clients <button class="add" type="button" data-new="clients">+ New client</button></h2>
+          <div class="tabs" role="group" aria-label="Filter clients" id="tabs"></div>
+          <div class="list" id="clientList"></div>
         </section>
 
         <section class="panel">
-          <h2>Quotes sent <button class="add" type="button">+ New quote</button></h2>
-          <div class="list">
-            <div class="quote-row"><div><b>Brian O.</b><p>PRULife Whole Life · KES 3,000,000 cover · pay 10 yrs · sent 14 Oct</p></div><div class="amt">2,925<small>KES / month</small></div><span class="pill quote">Call today 13:30</span></div>
-            <div class="quote-row"><div><b>James &amp; Ruth N.</b><p>Family life cover · KES 5,000,000 · sent 9 Oct</p></div><div class="amt">4,180<small>KES / month</small></div><span class="pill new">Follow up Mon</span></div>
-            <div class="quote-row"><div><b>Peter M.</b><p>PRULife Whole Life · KES 1,000,000 · sent 25 Sep</p></div><div class="amt">1,240<small>KES / month</small></div><span class="pill done">Accepted</span></div>
-          </div>
-          <p class="panel-note">Each row links to the Prudential quote PDF she sent, so she can resend it in one tap.</p>
+          <h2>Quotes sent <button class="add" type="button" data-new="quotes">+ New quote</button></h2>
+          <div class="list" id="quoteList"></div>
         </section>
       </div>
 
       <div style="display:grid;gap:28px">
         <section class="panel">
           <h2>To do</h2>
-          <ul class="list todo">
-            <li><input type="checkbox" id="t1"><label for="t1">Send Brian the revised quote<small>Before 13:30 call</small></label></li>
-            <li><input type="checkbox" id="t2"><label for="t2">Collect ID copy from Mercy K.<small>Waiting 3 days</small></label></li>
-            <li><input type="checkbox" id="t3" checked><label for="t3">Post on WhatsApp status about education plans<small>Done this morning</small></label></li>
-            <li><input type="checkbox" id="t4"><label for="t4">Remind Peter M. his premium is due<small>Due 20 October</small></label></li>
-          </ul>
+          <div class="list">
+            <ul class="todo" id="todoList"></ul>
+            <form class="quick" id="todoQuick"><input id="todoText" placeholder="Add a to-do…" aria-label="New to-do" maxlength="200"><button class="add" type="submit">Add</button></form>
+          </div>
         </section>
 
         <section class="panel">
-          <h2>This week</h2>
-          <div class="list">
-            <div class="item"><div class="time">Fri<small>16 Oct</small></div><div><b>Mercy K.</b><p>Sign forms · her office, Westlands</p></div><span class="pill docs">Documents</span></div>
-            <div class="item"><div class="time">Sat<small>17 Oct</small></div><div><b>Church fellowship talk</b><p>"Planning for your children's fees"</p></div><span class="pill new">Event</span></div>
-            <div class="item"><div class="time">Mon<small>19 Oct</small></div><div><b>James & Ruth N.</b><p>Family life cover review</p></div><span class="pill quote">Quote sent</span></div>
-          </div>
+          <h2>Coming up <button class="add" type="button" data-new="meetings">+ Add</button></h2>
+          <div class="list" id="weekList"></div>
         </section>
       </div>
     </div>
   </main>
 </div>
 
+<dialog class="sheet" id="sheet"><form id="sheetForm" method="dialog" novalidate></form></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
 <script>
 (function () {
+  'use strict';
   var $ = function (id) { return document.getElementById(id) };
-  var clients = [
-    { n: 'Grace W.', d: 'Education plan · met at church event', s: 'new', l: 'New' },
-    { n: 'Kevin A.', d: 'Life cover · referred by Brian O.', s: 'new', l: 'New' },
-    { n: 'Faith M.', d: 'Savings plan · asked on the website', s: 'new', l: 'New' },
-    { n: 'Brian O.', d: 'Life cover · quote sent 12 Oct', s: 'quote', l: 'Quote sent' },
-    { n: 'James & Ruth N.', d: 'Family life cover · quote sent 9 Oct', s: 'quote', l: 'Quote sent' },
-    { n: 'Mercy K.', d: 'Education plan · needs ID copy', s: 'docs', l: 'Documents' },
-    { n: 'Daniel O.', d: 'Health cover · needs KRA PIN', s: 'docs', l: 'Documents' },
-    { n: 'Peter M.', d: 'Life cover · covered 2 Oct', s: 'done', l: 'Covered' },
-    { n: 'Esther J.', d: 'Education plan · covered 6 Oct', s: 'done', l: 'Covered' }
-  ];
-  function render(f) {
-    var rows = clients.filter(function (c) { return f === 'all' ? c.s !== 'done' : c.s === f });
-    $('clients').innerHTML = rows.map(function (c) {
-      return '<div class="client"><b>' + c.n + '</b><p>' + c.d + ' · <a class="wa" href="#" onclick="return false">WhatsApp</a></p><span class="pill ' + c.s + '">' + c.l + '</span></div>';
-    }).join('') || '<p class="empty">No clients here yet.</p>';
+  var cfg = window.AGIZA_OFFICE || {};
+  var DEMO = !(cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase);
+  var sb = DEMO ? null : window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+  var TABLES = ['clients', 'meetings', 'quotes', 'todos'];
+  var data = { clients: [], meetings: [], quotes: [], todos: [] };
+  var userId = null, clientFilter = 'all', showAllDone = false;
+
+  /* ---------- small helpers ---------- */
+  function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] }) }
+  function pad(n) { return (n < 10 ? '0' : '') + n }
+  function dayStr(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) }
+  function todayStr() { return dayStr(new Date()) }
+  function hm(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()) }
+  function money(n) { return n == null || n === '' ? '' : Number(n).toLocaleString('en-KE', { maximumFractionDigits: 0 }) }
+  function shortDate(s) { if (!s) return ''; var d = new Date(s + (s.length === 10 ? 'T00:00' : '')); return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) }
+  function waLink(phone) {
+    var d = String(phone || '').replace(/\D/g, '');
+    if (!d) return '';
+    if (d[0] === '0') d = '254' + d.slice(1);
+    else if (d.length === 9) d = '254' + d;
+    return 'https://wa.me/' + d;
   }
-  document.querySelectorAll('.tabs button').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('.tabs button').forEach(function (x) { x.setAttribute('aria-pressed', x === b) });
-      render(b.dataset.f);
+  var toastTimer;
+  function toast(msg, bad) {
+    var t = $('toast'); t.textContent = msg; t.className = 'toast' + (bad ? ' bad' : ''); t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true }, bad ? 6000 : 2500);
+  }
+  function friendly(err) {
+    var m = (err && (err.message || err.error_description)) || String(err);
+    if (/signups not allowed|user not found/i.test(m)) return "That email can't sign in to this office.";
+    if (/rate limit|too many|security purposes/i.test(m)) return 'Too many tries. Wait a few minutes, then try again.';
+    if (/expired|invalid/i.test(m) && /token|otp|code/i.test(m)) return 'That code is wrong or has expired. Request a new one.';
+    if (/fetch|network/i.test(m)) return 'No internet connection. Check your data or Wi-Fi.';
+    return m;
+  }
+
+  /* ---------- data layer: Supabase, or in-memory sample data in demo mode ---------- */
+  var api = DEMO ? demoApi() : {
+    list: function (t) {
+      return sb.from(t).select('*').order('created_at', { ascending: false }).limit(1000)
+        .then(function (r) { if (r.error) throw r.error; return r.data });
+    },
+    insert: function (t, row) { return sb.from(t).insert(row).then(function (r) { if (r.error) throw r.error }) },
+    update: function (t, id, row) { return sb.from(t).update(row).eq('id', id).then(function (r) { if (r.error) throw r.error }) },
+    remove: function (t, id) { return sb.from(t).delete().eq('id', id).then(function (r) { if (r.error) throw r.error }) },
+    upload: function (file) {
+      var path = userId + '/' + Date.now() + '-' + file.name.replace(/[^\w.\-]+/g, '_').slice(-80);
+      return sb.storage.from('quotes').upload(path, file, { contentType: 'application/pdf' })
+        .then(function (r) { if (r.error) throw r.error; return path });
+    },
+    removeFile: function (path) { return path ? sb.storage.from('quotes').remove([path]) : Promise.resolve() },
+    fileUrl: function (path) {
+      return sb.storage.from('quotes').createSignedUrl(path, 300).then(function (r) { if (r.error) throw r.error; return r.data.signedUrl });
+    }
+  };
+
+  function demoApi() {
+    var now = new Date(), seq = 0;
+    function at(dayOffset, h, m) { var d = new Date(now); d.setDate(d.getDate() + dayOffset); d.setHours(h, m || 0, 0, 0); return d.toISOString() }
+    function day(off) { var d = new Date(now); d.setDate(d.getDate() + off); return dayStr(d) }
+    function id() { return 'demo-' + (++seq) }
+    var db = {
+      clients: [
+        { name: 'Grace W.', phone: '0700000001', plan: 'Education', status: 'new', note: 'Met at church event' },
+        { name: 'Kevin A.', phone: '0700000002', plan: 'Whole life cover', status: 'new', note: 'Referred by Brian O.' },
+        { name: 'Brian O.', phone: '0700000003', plan: 'Whole life cover', status: 'quote', note: 'Wants to pay over 10 years' },
+        { name: 'Mercy K.', phone: '0700000004', plan: 'Education', status: 'docs', note: 'Needs ID copy' },
+        { name: 'Peter M.', phone: '0700000005', plan: 'Whole life cover', status: 'done', covered_on: day(-3) },
+        { name: 'Esther J.', phone: '0700000006', plan: 'Education', status: 'done', covered_on: day(-40) }
+      ],
+      meetings: [
+        { title: 'Grace W.', starts_at: at(0, 10), duration_min: 45, place: 'Sarit Centre café', kind: 'new', note: 'Education plan for 2 children' },
+        { title: 'Brian O.', starts_at: at(0, 13, 30), duration_min: 30, place: 'WhatsApp call', kind: 'quote' },
+        { title: 'Branch team meeting', starts_at: at(0, 16), duration_min: 60, place: 'Upper Hill office', kind: 'office' },
+        { title: 'Mercy K.', starts_at: at(1, 11), duration_min: 30, place: 'Westlands', kind: 'docs', note: 'Sign forms' },
+        { title: 'Church fellowship talk', starts_at: at(2, 15), duration_min: 60, place: 'Parish hall', kind: 'event' }
+      ],
+      quotes: [
+        { client_name: 'Brian O.', plan: 'PRULife Whole Life', sum_assured: 3000000, premium_monthly: 2925, sent_on: day(-2), status: 'follow', next_step: 'Call today 13:30' },
+        { client_name: 'Peter M.', plan: 'PRULife Whole Life', sum_assured: 1000000, premium_monthly: 1240, sent_on: day(-20), status: 'accepted' }
+      ],
+      todos: [
+        { text: 'Send Brian the revised quote', due: day(0), done: false },
+        { text: 'Collect ID copy from Mercy K.', due: day(1), done: false },
+        { text: 'Post on WhatsApp status about education plans', done: true }
+      ]
+    };
+    TABLES.forEach(function (t) { db[t].forEach(function (r, i) { r.id = id(); r.created_at = new Date(now - i * 1000).toISOString() }) });
+    var copy = function (x) { return JSON.parse(JSON.stringify(x)) };
+    return {
+      list: function (t) { return Promise.resolve(copy(db[t])) },
+      insert: function (t, row) { row = copy(row); row.id = id(); row.created_at = new Date().toISOString(); db[t].unshift(row); return Promise.resolve() },
+      update: function (t, rid, row) { db[t].forEach(function (r) { if (r.id === rid) Object.assign(r, copy(row)) }); return Promise.resolve() },
+      remove: function (t, rid) { db[t] = db[t].filter(function (r) { return r.id !== rid }); return Promise.resolve() },
+      upload: function (file) { return Promise.resolve('demo/' + file.name) },
+      removeFile: function () { return Promise.resolve() },
+      fileUrl: function () { return Promise.reject(new Error('PDFs are not stored in the demo.')) }
+    };
+  }
+
+  function loadAll() {
+    return Promise.all(TABLES.map(function (t) { return api.list(t).then(function (rows) { data[t] = rows }) }))
+      .then(render)
+      .catch(function (e) { toast(friendly(e), true) });
+  }
+  function reload(t) { return api.list(t).then(function (rows) { data[t] = rows; render() }) }
+
+  /* ---------- rendering ---------- */
+  var KIND = { new: 'First chat', quote: 'Quote', docs: 'Documents', office: 'Office', event: 'Event' };
+  var STATUS = { new: 'New', quote: 'Quote sent', docs: 'Documents', done: 'Covered' };
+  var QSTATUS = { waiting: 'Waiting', follow: 'Follow up', accepted: 'Accepted', declined: 'Declined' };
+
+  function meetingRow(m, withDay) {
+    var d = new Date(m.starts_at), past = d.getTime() + (m.duration_min || 0) * 60000 < Date.now();
+    var left = withDay
+      ? d.toLocaleDateString('en-GB', { weekday: 'short' }) + '<small>' + d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' · ' + hm(d) + '</small>'
+      : hm(d) + '<small>' + (m.duration_min >= 60 ? (m.duration_min / 60) + ' hr' : m.duration_min + ' min') + '</small>';
+    var sub = [m.note, m.place].filter(Boolean).map(esc).join(' · ');
+    return '<div class="item" data-edit="meetings" data-id="' + esc(m.id) + '"><div class="time">' + left + '</div><div><b>' + esc(m.title) + '</b>' +
+      (sub ? '<p>' + sub + '</p>' : '') + '</div><span class="pill ' + (past ? 'past' : esc(m.kind)) + '">' + (past ? 'Done' : esc(KIND[m.kind] || m.kind)) + '</span></div>';
+  }
+
+  function render() {
+    var now = new Date(), today = todayStr();
+    var h = now.getHours();
+    $('greet').textContent = (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ', Agiza';
+    $('today').textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+
+    var ms = data.meetings.slice().sort(function (a, b) { return a.starts_at < b.starts_at ? -1 : 1 });
+    var todays = ms.filter(function (m) { return dayStr(new Date(m.starts_at)) === today });
+    var weekEnd = new Date(now); weekEnd.setDate(weekEnd.getDate() + 8); weekEnd.setHours(0, 0, 0, 0);
+    var upcoming = ms.filter(function (m) { var d = new Date(m.starts_at); return dayStr(d) > today && d < weekEnd });
+    var next = todays.filter(function (m) { return new Date(m.starts_at) > now })[0];
+
+    $('todayList').innerHTML = todays.map(function (m) { return meetingRow(m, false) }).join('') || '<p class="empty">No meetings today.</p>';
+    $('weekList').innerHTML = upcoming.map(function (m) { return meetingRow(m, true) }).join('') || '<p class="empty">Nothing in the next 7 days.</p>';
+
+    var pending = data.clients.filter(function (c) { return c.status !== 'done' });
+    var done = data.clients.filter(function (c) { return c.status === 'done' });
+    var month = today.slice(0, 7);
+    var newCount = data.clients.filter(function (c) { return c.status === 'new' }).length;
+    $('sToday').textContent = todays.length;
+    $('sTodayNext').textContent = next ? 'next at ' + hm(new Date(next.starts_at)) : (todays.length ? 'all done' : 'free day');
+    $('sPending').textContent = pending.length;
+    $('sPendingNew').textContent = newCount ? newCount + ' new' : 'none new';
+    $('sMonth').textContent = done.filter(function (c) { return (c.covered_on || '').slice(0, 7) === month }).length;
+    $('sMonthName').textContent = now.toLocaleDateString('en-GB', { month: 'long' });
+    $('sAll').textContent = done.length;
+
+    var counts = { all: pending.length, new: 0, quote: 0, docs: 0, done: done.length };
+    data.clients.forEach(function (c) { if (c.status !== 'done') counts[c.status]++ });
+    var tabs = [['all', 'All pending'], ['new', 'New'], ['quote', 'Quote sent'], ['docs', 'Waiting for documents'], ['done', 'Covered']];
+    $('tabs').innerHTML = tabs.map(function (t) {
+      return '<button type="button" data-f="' + t[0] + '" aria-pressed="' + (clientFilter === t[0]) + '">' + t[1] + ' · ' + counts[t[0]] + '</button>';
+    }).join('');
+    var rows = data.clients.filter(function (c) { return clientFilter === 'all' ? c.status !== 'done' : c.status === clientFilter });
+    $('clientList').innerHTML = rows.map(function (c) {
+      var wa = waLink(c.phone);
+      var sub = [c.plan, c.note, c.status === 'done' && c.covered_on ? 'covered ' + shortDate(c.covered_on) : ''].filter(Boolean).map(esc).join(' · ');
+      return '<div class="client" data-edit="clients" data-id="' + esc(c.id) + '"><b>' + esc(c.name) + '</b><p>' + sub +
+        (wa ? (sub ? ' · ' : '') + '<a class="wa" href="' + esc(wa) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') +
+        '</p><span class="pill ' + esc(c.status) + '">' + esc(STATUS[c.status]) + '</span></div>';
+    }).join('') || '<p class="empty">No clients here yet.</p>';
+
+    var qs = data.quotes.slice().sort(function (a, b) { return a.sent_on < b.sent_on ? 1 : -1 });
+    $('quoteList').innerHTML = qs.map(function (q) {
+      var sub = [q.plan, q.sum_assured ? 'KES ' + money(q.sum_assured) + ' cover' : '', 'sent ' + shortDate(q.sent_on)].filter(Boolean).map(esc).join(' · ');
+      return '<div class="quote-row" data-edit="quotes" data-id="' + esc(q.id) + '"><div><b>' + esc(q.client_name) + '</b><p>' + sub +
+        (q.pdf_path ? ' · <button type="button" class="pdf" data-pdf="' + esc(q.pdf_path) + '">Open PDF</button>' : '') + '</p></div>' +
+        '<div class="amt">' + (q.premium_monthly != null ? money(q.premium_monthly) + '<small>KES / month</small>' : '') + '</div>' +
+        '<span class="pill ' + esc(q.status) + '">' + esc(q.next_step || QSTATUS[q.status]) + '</span></div>';
+    }).join('') || '<p class="empty">No quotes yet. Add one when you send a Prudential quote.</p>';
+
+    var open = data.todos.filter(function (t) { return !t.done }).sort(function (a, b) { return (a.due || '9') < (b.due || '9') ? -1 : 1 });
+    var closed = data.todos.filter(function (t) { return t.done });
+    var shownClosed = showAllDone ? closed : closed.slice(0, 3);
+    $('todoList').innerHTML = open.concat(shownClosed).map(function (t) {
+      var late = !t.done && t.due && t.due < today;
+      return '<li><input type="checkbox" id="t-' + esc(t.id) + '" data-toggle="' + esc(t.id) + '"' + (t.done ? ' checked' : '') + '><label for="t-' + esc(t.id) + '">' + esc(t.text) +
+        (t.due ? '<small' + (late ? ' style="color:var(--rose)"' : '') + '>' + (late ? 'Overdue · ' : 'Due ') + esc(shortDate(t.due)) + '</small>' : '') +
+        '</label><button type="button" class="edit" data-edit="todos" data-id="' + esc(t.id) + '" aria-label="Edit">Edit</button></li>';
+    }).join('') + (closed.length > 3 ? '<li style="padding:0"><button type="button" class="more" id="moreDone">' + (showAllDone ? 'Hide finished' : 'Show all ' + closed.length + ' finished') + '</button></li>' : '')
+      || '<li class="empty">Nothing to do. Add your first to-do below.</li>';
+  }
+
+  /* ---------- add / edit sheet ---------- */
+  var PLANS = ['Whole life cover', 'Education', 'Savings & investment', 'Health'];
+  var FORMS = {
+    clients: { title: 'client', fields: [
+      { k: 'name', label: 'Name', req: true, max: 120 },
+      { k: 'phone', label: 'Phone (for WhatsApp)', type: 'tel', max: 30, ph: '07…' },
+      { k: 'plan', label: 'Plan of interest', list: PLANS, max: 120 },
+      { k: 'status', label: 'Stage', type: 'select', opts: [['new', 'New'], ['quote', 'Quote sent'], ['docs', 'Waiting for documents'], ['done', 'Covered']] },
+      { k: 'note', label: 'Notes', type: 'textarea', max: 1000 }
+    ] },
+    meetings: { title: 'meeting', fields: [
+      { k: 'title', label: 'Who or what', req: true, max: 120, list: 'clients' },
+      [{ k: '_date', label: 'Date', type: 'date', req: true }, { k: '_time', label: 'Time', type: 'time', req: true }],
+      [{ k: 'duration_min', label: 'How long', type: 'select', opts: [['15', '15 min'], ['30', '30 min'], ['45', '45 min'], ['60', '1 hour'], ['90', '1½ hours'], ['120', '2 hours'], ['180', '3 hours']] },
+       { k: 'kind', label: 'Type', type: 'select', opts: [['new', 'First chat'], ['quote', 'Quote'], ['docs', 'Documents'], ['office', 'Office'], ['event', 'Event']] }],
+      { k: 'place', label: 'Where', max: 160, ph: 'Café, office or WhatsApp call' },
+      { k: 'note', label: 'Notes', type: 'textarea', max: 1000 }
+    ] },
+    quotes: { title: 'quote', fields: [
+      { k: 'client_name', label: 'Client', req: true, max: 120, list: 'clients' },
+      { k: 'plan', label: 'Plan', max: 120, list: ['PRULife Whole Life'].concat(PLANS) },
+      [{ k: 'sum_assured', label: 'Cover (KES)', type: 'number' }, { k: 'premium_monthly', label: 'Monthly premium (KES)', type: 'number' }],
+      [{ k: 'sent_on', label: 'Date sent', type: 'date', req: true }, { k: 'status', label: 'Status', type: 'select', opts: [['waiting', 'Waiting'], ['follow', 'Follow up'], ['accepted', 'Accepted'], ['declined', 'Declined']] }],
+      { k: 'next_step', label: 'Next step', max: 160, ph: 'e.g. Call Monday' },
+      { k: '_pdf', label: 'Quote PDF', type: 'file' }
+    ] },
+    todos: { title: 'to-do', fields: [
+      { k: 'text', label: 'To-do', req: true, max: 200 },
+      { k: 'due', label: 'Due date (optional)', type: 'date' }
+    ] }
+  };
+
+  function fieldHtml(f, val) {
+    var id = 'f_' + f.k, attrs = ' id="' + id + '" name="' + f.k + '"' + (f.req ? ' required' : '') + (f.max ? ' maxlength="' + f.max + '"' : '') + (f.ph ? ' placeholder="' + esc(f.ph) + '"' : '');
+    var input;
+    if (f.type === 'select') {
+      input = '<select class="field"' + attrs + '>' + f.opts.map(function (o) { return '<option value="' + o[0] + '"' + (String(val) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>' }).join('') + '</select>';
+    } else if (f.type === 'textarea') {
+      input = '<textarea class="field"' + attrs + '>' + esc(val) + '</textarea>';
+    } else if (f.type === 'file') {
+      input = '<input class="field" type="file" accept="application/pdf"' + attrs + '>' + (val ? '<p class="note">A PDF is attached. Choose a new file only to replace it.</p>' : '');
+    } else {
+      var list = f.list === 'clients' ? data.clients.map(function (c) { return c.name }) : f.list;
+      input = '<input class="field" type="' + (f.type || 'text') + '"' + attrs + (f.type === 'number' ? ' min="0" step="1" inputmode="numeric"' : '') +
+        (list ? ' list="' + id + '_l"' : '') + ' value="' + esc(val) + '">' +
+        (list ? '<datalist id="' + id + '_l">' + list.map(function (x) { return '<option value="' + esc(x) + '">' }).join('') + '</datalist>' : '');
+    }
+    return '<div><label for="' + id + '">' + f.label + '</label>' + input + '</div>';
+  }
+
+  var editing = null;
+  function openSheet(table, row) {
+    editing = { table: table, row: row || null };
+    var spec = FORMS[table], v = Object.assign({}, row || {});
+    if (table === 'meetings') {
+      var d = row ? new Date(row.starts_at) : (function () { var x = new Date(); x.setMinutes(0, 0, 0); x.setHours(x.getHours() + 1); return x })();
+      v._date = dayStr(d); v._time = hm(d); v.duration_min = String(v.duration_min || 30); v.kind = v.kind || 'new';
+    }
+    if (table === 'quotes') { v.sent_on = v.sent_on || todayStr(); v.status = v.status || 'waiting'; v._pdf = v.pdf_path }
+    if (table === 'clients') v.status = v.status || 'new';
+    var html = '<h2>' + (row ? 'Edit ' : 'New ') + spec.title + ' <button type="button" id="sheetClose" aria-label="Close">×</button></h2>';
+    spec.fields.forEach(function (f) {
+      html += Array.isArray(f) ? '<div class="row2">' + f.map(function (g) { return fieldHtml(g, v[g.k]) }).join('') + '</div>' : fieldHtml(f, v[f.k]);
     });
+    html += '<p class="err" id="sheetErr" hidden></p><div class="actions">' + (row ? '<button type="button" class="del" id="sheetDel">Delete</button>' : '') +
+      '<button type="submit" class="pri" id="sheetSave">Save</button></div>';
+    var form = $('sheetForm'); form.innerHTML = html;
+    $('sheet').showModal();
+    var first = form.querySelector('input, select, textarea'); if (first && !row) first.focus();
+  }
+
+  function collect(form) {
+    var out = {}, t = editing.table;
+    FORMS[t].fields.forEach(function walk(f) {
+      if (Array.isArray(f)) return f.forEach(walk);
+      if (f.k[0] === '_') return;
+      var el = form.elements[f.k], val = el.value.trim();
+      out[f.k] = f.type === 'number' ? (val === '' ? null : Number(val)) : f.type === 'select' && f.k === 'duration_min' ? Number(val) : (val === '' ? null : val);
+    });
+    if (t === 'meetings') out.starts_at = new Date(form.elements._date.value + 'T' + form.elements._time.value).toISOString();
+    if (t === 'clients') {
+      var was = editing.row || {};
+      out.covered_on = out.status === 'done' ? (was.status === 'done' && was.covered_on ? was.covered_on : todayStr()) : null;
+    }
+    return out;
+  }
+
+  $('sheetForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var form = e.target, err = $('sheetErr');
+    var missing = Array.prototype.filter.call(form.querySelectorAll('[required]'), function (el) { return !el.value.trim() });
+    if (missing.length) { err.textContent = 'Please fill in: ' + missing.map(function (el) { return form.querySelector('label[for="' + el.id + '"]').textContent }).join(', ') + '.'; err.hidden = false; missing[0].focus(); return }
+    var row = collect(form), t = editing.table, old = editing.row;
+    var file = form.elements._pdf && form.elements._pdf.files[0];
+    if (file && file.size > 5 * 1024 * 1024) { err.textContent = 'That PDF is over 5 MB. Please use a smaller file.'; err.hidden = false; return }
+    form.classList.add('busy');
+    var chain = Promise.resolve();
+    if (file) chain = api.upload(file).then(function (path) { row.pdf_path = path; if (old && old.pdf_path) return api.removeFile(old.pdf_path) });
+    chain.then(function () { return old ? api.update(t, old.id, row) : api.insert(t, row) })
+      .then(function () { $('sheet').close(); toast('Saved'); return reload(t) })
+      .catch(function (e2) { err.textContent = friendly(e2); err.hidden = false })
+      .then(function () { form.classList.remove('busy') });
   });
-  render('all');
 
-  var d = new Date(), h = d.getHours();
-  $('greet').textContent = (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ', Agiza';
-  $('today').textContent = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  $('sheetForm').addEventListener('click', function (e) {
+    if (e.target.id === 'sheetClose') return $('sheet').close();
+    if (e.target.id === 'sheetDel') {
+      var b = e.target;
+      if (!b.classList.contains('sure')) { b.classList.add('sure'); b.textContent = 'Tap again to delete'; return }
+      var t = editing.table, old = editing.row;
+      $('sheetForm').classList.add('busy');
+      api.remove(t, old.id).then(function () { return api.removeFile(old.pdf_path) })
+        .then(function () { $('sheet').close(); toast('Deleted'); return reload(t) })
+        .catch(function (e2) { toast(friendly(e2), true) })
+        .then(function () { $('sheetForm').classList.remove('busy') });
+    }
+  });
 
-  function openOffice() { $('login').hidden = true; $('office').hidden = false; window.scrollTo(0, 0) }
-  $('google').addEventListener('click', openOffice);
+  /* ---------- clicks on the dashboard ---------- */
+  function find(t, id) { return data[t].filter(function (r) { return String(r.id) === id })[0] }
+  $('office').addEventListener('click', function (e) {
+    var el = e.target;
+    if (el.closest('a')) return;
+    var pdf = el.closest('[data-pdf]');
+    if (pdf) {
+      e.stopPropagation();
+      var w = window.open('', '_blank');
+      api.fileUrl(pdf.dataset.pdf).then(function (u) { if (w) w.location = u; else location.href = u })
+        .catch(function (e2) { if (w) w.close(); toast(friendly(e2), true) });
+      return;
+    }
+    var nb = el.closest('[data-new]'); if (nb) return openSheet(nb.dataset.new);
+    var f = el.closest('[data-f]'); if (f) { clientFilter = f.dataset.f; return render() }
+    if (el.id === 'moreDone') { showAllDone = !showAllDone; return render() }
+    if (el.dataset.toggle) return;
+    var ed = el.closest('[data-edit]'); if (ed) { var row = find(ed.dataset.edit, ed.dataset.id); if (row) openSheet(ed.dataset.edit, row) }
+  });
+  $('office').addEventListener('change', function (e) {
+    var id = e.target.dataset.toggle; if (!id) return;
+    var done = e.target.checked;
+    api.update('todos', id, { done: done }).then(function () { return reload('todos') }).catch(function (e2) { e.target.checked = !done; toast(friendly(e2), true) });
+  });
+  $('todoQuick').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var input = $('todoText'), text = input.value.trim(); if (!text) return;
+    input.disabled = true;
+    api.insert('todos', { text: text }).then(function () { input.value = ''; return reload('todos') })
+      .catch(function (e2) { toast(friendly(e2), true) }).then(function () { input.disabled = false; input.focus() });
+  });
+
+  /* ---------- sign in / out ---------- */
+  function showOffice() { $('login').hidden = true; $('office').hidden = false; window.scrollTo(0, 0); loadAll() }
+  function showLogin() { $('office').hidden = true; $('login').hidden = false; $('step2').hidden = true; $('step1').hidden = false; $('code').value = '' }
+  var pendingEmail = '';
+
   $('emailForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    var v = $('email').value.trim();
-    var bad = !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
-    $('emailErr').hidden = !bad;
-    if (bad) return;
-    $('sentTo').textContent = v; $('step1').hidden = true; $('step2').hidden = false; $('code').focus();
+    var v = $('email').value.trim(), errEl = $('emailErr');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { errEl.textContent = 'Enter the email address you use for your office.'; errEl.hidden = false; return }
+    errEl.hidden = true;
+    var go = function () { pendingEmail = v; $('sentTo').textContent = v; $('step1').hidden = true; $('step2').hidden = false; $('code').focus() };
+    if (DEMO) return go();
+    e.target.classList.add('busy');
+    sb.auth.signInWithOtp({ email: v, options: { shouldCreateUser: false } })
+      .then(function (r) { if (r.error) throw r.error; go() })
+      .catch(function (e2) { errEl.textContent = friendly(e2); errEl.hidden = false })
+      .then(function () { e.target.classList.remove('busy') });
   });
   $('codeForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    var ok = /^\d{6}$/.test($('code').value.trim());
-    $('codeErr').hidden = ok;
-    if (ok) openOffice();
+    var c = $('code').value.replace(/\D/g, ''), errEl = $('codeErr');
+    if (c.length < 6) { errEl.textContent = 'Enter the code from your email.'; errEl.hidden = false; return }
+    errEl.hidden = true;
+    if (DEMO) return showOffice();
+    e.target.classList.add('busy');
+    sb.auth.verifyOtp({ email: pendingEmail, token: c, type: 'email' })
+      .then(function (r) { if (r.error) throw r.error })
+      .catch(function (e2) { errEl.textContent = friendly(e2); errEl.hidden = false })
+      .then(function () { e.target.classList.remove('busy') });
   });
   $('back').addEventListener('click', function () { $('step2').hidden = true; $('step1').hidden = false });
   $('signout').addEventListener('click', function () {
-    $('office').hidden = true; $('login').hidden = false; $('step2').hidden = true; $('step1').hidden = false; $('code').value = ''; window.scrollTo(0, 0);
+    if (DEMO) return showLogin();
+    sb.auth.signOut().then(showLogin);
   });
+
+  if (DEMO) {
+    $('demoBar').hidden = false;
+    showLogin();
+  } else {
+    sb.auth.onAuthStateChange(function (event, session) {
+      var uid = session && session.user ? session.user.id : null;
+      if (uid && uid !== userId) { userId = uid; setTimeout(showOffice, 0) }
+      else if (!uid && (userId || event === 'INITIAL_SESSION')) { userId = null; TABLES.forEach(function (t) { data[t] = [] }); showLogin() }
+    });
+  }
+  // Refresh the "today" view when she comes back to the app later in the day.
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && !$('office').hidden) loadAll() });
 })();
 </script>
 </body>
