@@ -49,3 +49,13 @@ The office saves to a free Supabase database. Until `office/config.js` is filled
 7. **Project Settings, API Keys:** copy the Project URL and the publishable key into `office/config.js`, then push.
 
 She signs in with her email and password and stays signed in on her phone. If she forgets the password, "Email me a reset link" on the sign-in page sends her a link that opens a "Choose a new password" screen. Supabase's free built-in email only reaches members of the Supabase team (she owns the project, so it reaches her), a few times an hour.
+
+### Phone reminders
+
+To-dos can carry a "Remind me at" time, and meetings remind 30 minutes before (changeable per meeting). Agiza taps **Turn on reminders** in the office once per phone. On iPhone she must first add the office to her Home Screen and open it from there.
+
+Setup, already done for her project:
+1. **SQL Editor:** run `supabase/reminders.sql`, after storing the legacy anon key in Vault as the file explains.
+2. **Edge Functions:** deploy `supabase/functions/reminders/index.ts` as a function named `reminders`, keeping "Verify JWT" on.
+
+pg_cron calls the function every minute. On its first run it creates the push keys and publishes the public half in `push_config`.

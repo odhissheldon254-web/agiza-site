@@ -69,6 +69,10 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .bar .logo small { font-family: var(--body); font-size: 12px; color: var(--soft); letter-spacing: .14em; text-transform: uppercase; margin-left: 8px; font-weight: 500 }
 .who { display: flex; align-items: center; gap: 10px; font-size: 14px }
 .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--blush); color: var(--rose); display: grid; place-items: center; font-family: var(--disp); font-weight: 600; font-size: 18px }
+.remind { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 18px; padding: 12px 16px; background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 4px; font-size: 14px }
+.remind.on { border-left-color: var(--ok); color: var(--soft) }
+.remind button { background: var(--ink); color: var(--paper); border: 0; border-radius: 3px; padding: 8px 14px; cursor: pointer; white-space: nowrap }
+.remind button.link { background: none; color: var(--rose); padding: 0 }
 .ghost { background: none; border: 1px solid var(--line); border-radius: 3px; padding: 7px 12px; cursor: pointer; font-size: 13px }
 .page { max-width: 1180px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px }
 .hello h1 { font-family: var(--disp); font-size: clamp(32px, 4vw, 44px); line-height: 1.1 }
@@ -233,6 +237,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     <div class="hello">
       <h1 id="greet">Hello, Agiza</h1>
       <p id="today"></p>
+      <div class="remind" id="remindBar" hidden><span id="remindText"></span><button type="button" id="remindBtn" hidden></button></div>
     </div>
 
     <div class="stats">
@@ -471,7 +476,8 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     $('todoList').innerHTML = open.concat(shownClosed).map(function (t) {
       var late = !t.done && t.due && t.due < today;
       return '<li><input type="checkbox" id="t-' + esc(t.id) + '" data-toggle="' + esc(t.id) + '"' + (t.done ? ' checked' : '') + '><label for="t-' + esc(t.id) + '">' + esc(t.text) +
-        (t.due ? '<small' + (late ? ' style="color:var(--rose)"' : '') + '>' + (late ? 'Overdue · ' : 'Due ') + esc(shortDate(t.due)) + '</small>' : '') +
+        (t.due ? '<small' + (late ? ' style="color:var(--rose)"' : '') + '>' + (late ? 'Overdue · ' : 'Due ') + esc(shortDate(t.due)) +
+          (t.remind_at && !t.done ? ' · 🔔 ' + esc(hm(new Date(t.remind_at))) : '') + '</small>' : '') +
         '</label><button type="button" class="edit" data-edit="todos" data-id="' + esc(t.id) + '" aria-label="Edit">Edit</button></li>';
     }).join('') + (closed.length > 3 ? '<li style="padding:0"><button type="button" class="more" id="moreDone">' + (showAllDone ? 'Hide finished' : 'Show all ' + closed.length + ' finished') + '</button></li>' : '')
       || '<li class="empty">Nothing to do. Add your first to-do below.</li>';
@@ -493,6 +499,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
       [{ k: 'duration_min', label: 'How long', type: 'select', opts: [['15', '15 min'], ['30', '30 min'], ['45', '45 min'], ['60', '1 hour'], ['90', '1½ hours'], ['120', '2 hours'], ['180', '3 hours']] },
        { k: 'kind', label: 'Type', type: 'select', opts: [['new', 'First chat'], ['quote', 'Quote'], ['docs', 'Documents'], ['office', 'Office'], ['event', 'Event']] }],
       { k: 'place', label: 'Where', max: 160, ph: 'Café, office or WhatsApp call' },
+      { k: 'remind_min', label: 'Remind me on my phone', type: 'select', opts: [['30', '30 min before'], ['15', '15 min before'], ['60', '1 hour before'], ['120', '2 hours before'], ['0', 'No reminder']] },
       { k: 'note', label: 'Notes', type: 'textarea', max: 1000 }
     ] },
     quotes: { title: 'quote', fields: [
@@ -505,7 +512,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     ] },
     todos: { title: 'to-do', fields: [
       { k: 'text', label: 'To-do', req: true, max: 200 },
-      { k: 'due', label: 'Due date (optional)', type: 'date' }
+      [{ k: 'due', label: 'Due date (optional)', type: 'date' }, { k: '_rtime', label: 'Remind me at (optional)', type: 'time' }]
     ] }
   };
 
@@ -534,7 +541,9 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     if (table === 'meetings') {
       var d = row ? new Date(row.starts_at) : (function () { var x = new Date(); x.setMinutes(0, 0, 0); x.setHours(x.getHours() + 1); return x })();
       v._date = dayStr(d); v._time = hm(d); v.duration_min = String(v.duration_min || 30); v.kind = v.kind || 'new';
+      v.remind_min = String(v.remind_min != null ? v.remind_min : 30);
     }
+    if (table === 'todos') v._rtime = v.remind_at ? hm(new Date(v.remind_at)) : '';
     if (table === 'quotes') { v.sent_on = v.sent_on || todayStr(); v.status = v.status || 'waiting'; v._pdf = v.pdf_path }
     if (table === 'clients') v.status = v.status || 'new';
     var html = '<h2>' + (row ? 'Edit ' : 'New ') + spec.title + ' <button type="button" id="sheetClose" aria-label="Close">×</button></h2>';
@@ -554,9 +563,15 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
       if (Array.isArray(f)) return f.forEach(walk);
       if (f.k[0] === '_') return;
       var el = form.elements[f.k], val = el.value.trim();
-      out[f.k] = f.type === 'number' ? (val === '' ? null : Number(val)) : f.type === 'select' && f.k === 'duration_min' ? Number(val) : (val === '' ? null : val);
+      out[f.k] = f.type === 'number' ? (val === '' ? null : Number(val)) : f.type === 'select' && (f.k === 'duration_min' || f.k === 'remind_min') ? Number(val) : (val === '' ? null : val);
     });
     if (t === 'meetings') out.starts_at = new Date(form.elements._date.value + 'T' + form.elements._time.value).toISOString();
+    if (t === 'todos') {
+      // A reminder time with no date means today.
+      var rt = form.elements._rtime.value;
+      if (rt && !out.due) out.due = todayStr();
+      out.remind_at = rt ? new Date(out.due + 'T' + rt).toISOString() : null;
+    }
     if (t === 'clients') {
       var was = editing.row || {};
       out.covered_on = out.status === 'done' ? (was.status === 'done' && was.covered_on ? was.covered_on : todayStr()) : null;
@@ -627,8 +642,67 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
       .catch(function (e2) { toast(friendly(e2), true) }).then(function () { input.disabled = false; input.focus() });
   });
 
+  /* ---------- phone reminders (web push, sent by the "reminders" Edge Function) ---------- */
+  var PUSH = !DEMO && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  var IOS_TAB = /iPhone|iPad|iPod/.test(navigator.userAgent) && !navigator.standalone;
+  var swReady = PUSH ? navigator.serviceWorker.register('sw.js').then(function () { return navigator.serviceWorker.ready }) : null;
+
+  function keyBytes(s) {
+    s = s.replace(/-/g, '+').replace(/_/g, '/'); s += '==='.slice((s.length + 3) % 4);
+    var raw = atob(s), out = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+    return out;
+  }
+  function saveSub(s) {
+    var j = s.toJSON();
+    return sb.from('push_subscriptions').upsert({ endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: 'endpoint' })
+      .then(function (r) { if (r.error) throw r.error });
+  }
+  function remindBar(text, btn, on) {
+    $('remindBar').hidden = false; $('remindBar').classList.toggle('on', !!on);
+    $('remindText').textContent = text;
+    $('remindBtn').hidden = !btn; $('remindBtn').textContent = btn || '';
+    $('remindBtn').className = on ? 'link' : '';
+  }
+  // Shows the right message, and re-saves this phone's subscription in case the browser renewed it.
+  function refreshReminders() {
+    if (DEMO) return;
+    if (!PUSH) return IOS_TAB ? remindBar('For phone reminders on iPhone: tap Share, then "Add to Home Screen", and open the office from there.') : ($('remindBar').hidden = true);
+    if (Notification.permission === 'denied') return remindBar('Reminders are blocked. Allow notifications for this site in your phone settings.');
+    swReady.then(function (reg) { return reg.pushManager.getSubscription() }).then(function (s) {
+      if (s && Notification.permission === 'granted') { saveSub(s).catch(function () {}); remindBar('🔔 Reminders are on for this phone.', 'Test', true) }
+      else remindBar('Get a phone alert before meetings and at your to-do times.', 'Turn on reminders');
+    });
+  }
+  $('remindBtn').addEventListener('click', function () {
+    var btn = this;
+    if (btn.textContent === 'Test') {
+      return swReady.then(function (reg) { return reg.showNotification('Agiza Office', { body: 'Reminders work on this phone.', icon: '/images/icon-192.png', tag: 'test' }) });
+    }
+    btn.disabled = true;
+    Notification.requestPermission().then(function (p) {
+      if (p !== 'granted') throw new Error('not allowed');
+      return Promise.all([swReady, sb.from('push_config').select('public_key').single().then(function (r) { if (r.error) throw r.error; return r.data })]);
+    }).then(function (a) {
+      var reg = a[0];
+      return reg.pushManager.getSubscription().then(function (s) {
+        return s || reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyBytes(a[1].public_key) });
+      });
+    }).then(saveSub).then(function () { toast('Reminders are on') })
+      .catch(function (e) { toast(e.message === 'not allowed' ? 'Reminders need notification permission.' : friendly(e), true) })
+      .then(function () { btn.disabled = false; refreshReminders() });
+  });
+  // On sign-out, stop sending reminders to this phone.
+  function forgetPhone() {
+    if (!PUSH) return Promise.resolve();
+    return swReady.then(function (reg) { return reg.pushManager.getSubscription() }).then(function (s) {
+      if (!s) return;
+      return sb.from('push_subscriptions').delete().eq('endpoint', s.endpoint).then(function () { return s.unsubscribe() });
+    }).catch(function () {});
+  }
+
   /* ---------- sign in / out ---------- */
-  function showOffice() { $('login').hidden = true; $('office').hidden = false; window.scrollTo(0, 0); loadAll() }
+  function showOffice() { $('login').hidden = true; $('office').hidden = false; window.scrollTo(0, 0); loadAll(); refreshReminders() }
   function showLogin() { $('office').hidden = true; $('login').hidden = false; $('step2').hidden = true; $('step1').hidden = false; $('password').value = '' }
   function showNewPassword() { $('office').hidden = true; $('login').hidden = false; $('step1').hidden = true; $('step2').hidden = false; $('newPass').focus() }
   var EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -672,7 +746,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
   });
   $('signout').addEventListener('click', function () {
     if (DEMO) return showLogin();
-    sb.auth.signOut().then(showLogin);
+    forgetPhone().then(function () { return sb.auth.signOut() }).then(showLogin);
   });
 
   if (DEMO) {
