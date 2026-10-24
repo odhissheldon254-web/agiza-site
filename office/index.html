@@ -239,7 +239,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
       <h1 id="greet">Hello, Agiza</h1>
       <p id="today"></p>
       <div class="remind" id="installBar" hidden><span>📲 Install Agiza Office on this phone, so it opens like an app.</span><button type="button" id="installBtn">Install</button></div>
-      <div class="remind" id="remindBar" hidden><span id="remindText"></span><button type="button" id="remindBtn" hidden></button></div>
+      <div class="remind" id="remindBar" hidden><span id="remindText"></span><span><a id="chimeLink" href="agiza-chime.wav" download="Agiza chime.wav" hidden style="color:var(--rose);margin-right:14px">Get the reminder sound</a><button type="button" id="remindBtn" hidden></button></span></div>
     </div>
 
     <div class="stats">
@@ -665,6 +665,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     $('remindText').textContent = text;
     $('remindBtn').hidden = !btn; $('remindBtn').textContent = btn || '';
     $('remindBtn').className = on ? 'link' : '';
+    $('chimeLink').hidden = !on || IOS_TAB;
   }
   // Shows the right message, and re-saves this phone's subscription in case the browser renewed it.
   function refreshReminders() {
