@@ -43,9 +43,9 @@ The office saves to a free Supabase database. Until `office/config.js` is filled
 1. Sign up at supabase.com, create a project (free plan, region closest to Kenya), and save the database password somewhere safe.
 2. **SQL Editor, New query:** paste all of `supabase/setup.sql`, then Run. This creates her tables, the private PDF folder and the locks.
 3. **Authentication, Sign In / Providers:** under Email, keep it enabled and switch **"Allow new users to sign up" OFF**.
-4. **Authentication, Users, Add user, Create new user:** enter Agiza's email and tick "Auto confirm". (No password needed.)
-5. **Authentication, Emails, Magic Link template:** add `Your sign-in code: {{ .Token }}` to the message, so the email contains the 6-digit code.
+4. **Authentication, Users, Add user, Create new user:** enter Agiza's email, a password of at least 8 characters, and tick "Auto confirm". Give her the password privately.
+5. **Authentication, Sign In / Providers, Email:** set the minimum password length to 8.
 6. **Authentication, URL Configuration:** set Site URL to `https://agiza.odhis.co.ke/office/`.
-7. **Project Settings, API:** copy the Project URL and the `anon` public key into `office/config.js`, then push.
+7. **Project Settings, API Keys:** copy the Project URL and the publishable key into `office/config.js`, then push.
 
-Supabase's free built-in email only sends to members of your Supabase team, a few times an hour. Invite Agiza's email under Organization, Team (or create the account with her email). She stays signed in on her phone, so she rarely needs a new code.
+She signs in with her email and password and stays signed in on her phone. If she forgets the password, "Email me a reset link" on the sign-in page sends her a link that opens a "Choose a new password" screen. Supabase's free built-in email only reaches members of the Supabase team (she owns the project, so it reaches her), a few times an hour.

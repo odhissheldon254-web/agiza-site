@@ -54,7 +54,7 @@ button, input, select, textarea { font: inherit; color: inherit }
 label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .field { width: 100%; font-size: 16px; padding: 13px 14px; border: 1px solid var(--line); background: var(--card); border-radius: 3px }
 .field:focus { border-color: var(--rose); outline: none }
-.code { letter-spacing: .5em; font-size: 22px; text-align: center; font-variant-numeric: tabular-nums }
+.ok { color: var(--soft); font-size: 13px; margin-top: 8px }
 .pri { width: 100%; margin-top: 14px; padding: 14px; background: var(--ink); color: var(--paper); border: 0; border-radius: 3px; cursor: pointer; font-weight: 500; letter-spacing: .02em }
 .pri:hover { background: #42234a }
 .hint { font-size: 13px; color: var(--soft); margin-top: 18px }
@@ -198,23 +198,25 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
         <p class="sub">Sign in to your office.</p>
         <form id="emailForm" novalidate>
           <label for="email">Email address</label>
-          <input class="field" id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@gmail.com">
+          <input class="field" id="email" type="email" autocomplete="username" inputmode="email" placeholder="you@gmail.com">
+          <label for="password" style="margin-top:14px">Password</label>
+          <input class="field" id="password" type="password" autocomplete="current-password">
           <p class="err" id="emailErr" hidden></p>
-          <button class="pri" type="submit">Email me a sign-in link</button>
+          <p class="ok" id="emailOk" hidden></p>
+          <button class="pri" type="submit">Open my office</button>
         </form>
-        <p class="hint">No password to remember. We email you a link, and this phone stays signed in.</p>
+        <p class="hint">Forgot your password? <button class="link" id="forgot" type="button">Email me a reset link</button></p>
       </div>
       <div id="step2" hidden>
         <div class="rule"></div>
-        <h2>Check your email</h2>
-        <p class="sub">We emailed <b id="sentTo"></b>. Tap the sign-in link in that email, or type the code if the email shows one. It expires in an hour.</p>
-        <form id="codeForm" novalidate>
-          <label for="code">Sign-in code</label>
-          <input class="field code" id="code" inputmode="numeric" maxlength="10" autocomplete="one-time-code" placeholder="••••••">
-          <p class="err" id="codeErr" hidden></p>
-          <button class="pri" type="submit">Open my office</button>
+        <h2>Choose a new password</h2>
+        <p class="sub">At least 8 characters. You'll use it to sign in from now on.</p>
+        <form id="newPassForm" novalidate>
+          <label for="newPass">New password</label>
+          <input class="field" id="newPass" type="password" autocomplete="new-password" minlength="8">
+          <p class="err" id="newPassErr" hidden></p>
+          <button class="pri" type="submit">Save and open my office</button>
         </form>
-        <p class="hint">Wrong email? <button class="link" id="back" type="button">Go back</button></p>
       </div>
     </div>
   </div>
@@ -288,7 +290,9 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
   var $ = function (id) { return document.getElementById(id) };
   var cfg = window.AGIZA_OFFICE || {};
   var DEMO = !(cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase);
-  var sb = DEMO ? null : window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+  // Read before the client clears the address: did she arrive from a password-reset email?
+  var recovering = /type=recovery/.test(location.hash);
+  var sb =DEMO ? null : window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
   var TABLES = ['clients', 'meetings', 'quotes', 'todos'];
   var data = { clients: [], meetings: [], quotes: [], todos: [] };
   var userId = null, clientFilter = 'all', showAllDone = false;
@@ -317,7 +321,9 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     var m = (err && (err.message || err.error_description)) || String(err);
     if (/signups not allowed|user not found/i.test(m)) return "That email can't sign in to this office.";
     if (/rate limit|too many|security purposes/i.test(m)) return 'Too many tries. Wait a few minutes, then try again.';
-    if (/expired|invalid/i.test(m) && /token|otp|code/i.test(m)) return 'That code is wrong or has expired. Request a new one.';
+    if (/invalid login credentials/i.test(m)) return 'Wrong email or password.';
+    if (/expired|invalid/i.test(m) && /token|otp|link/i.test(m)) return 'That reset link has expired. Request a new one.';
+    if (/should be different/i.test(m)) return 'Choose a password different from your old one.';
     if (/fetch|network/i.test(m)) return 'No internet connection. Check your data or Wi-Fi.';
     return m;
   }
@@ -623,36 +629,47 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
 
   /* ---------- sign in / out ---------- */
   function showOffice() { $('login').hidden = true; $('office').hidden = false; window.scrollTo(0, 0); loadAll() }
-  function showLogin() { $('office').hidden = true; $('login').hidden = false; $('step2').hidden = true; $('step1').hidden = false; $('code').value = '' }
-  var pendingEmail = '';
+  function showLogin() { $('office').hidden = true; $('login').hidden = false; $('step2').hidden = true; $('step1').hidden = false; $('password').value = '' }
+  function showNewPassword() { $('office').hidden = true; $('login').hidden = false; $('step1').hidden = true; $('step2').hidden = false; $('newPass').focus() }
+  var EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
   $('emailForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    var v = $('email').value.trim(), errEl = $('emailErr');
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) { errEl.textContent = 'Enter the email address you use for your office.'; errEl.hidden = false; return }
-    errEl.hidden = true;
-    var go = function () { pendingEmail = v; $('sentTo').textContent = v; $('step1').hidden = true; $('step2').hidden = false; $('code').focus() };
-    if (DEMO) return go();
-    e.target.classList.add('busy');
-    // The email carries a link back to this page (and a code, if the template shows one).
-    sb.auth.signInWithOtp({ email: v, options: { shouldCreateUser: false, emailRedirectTo: location.origin + location.pathname } })
-      .then(function (r) { if (r.error) throw r.error; go() })
-      .catch(function (e2) { errEl.textContent = friendly(e2); errEl.hidden = false })
-      .then(function () { e.target.classList.remove('busy') });
-  });
-  $('codeForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var c = $('code').value.replace(/\D/g, ''), errEl = $('codeErr');
-    if (c.length < 6) { errEl.textContent = 'Enter the code from your email.'; errEl.hidden = false; return }
+    var v = $('email').value.trim(), p = $('password').value, errEl = $('emailErr');
+    $('emailOk').hidden = true;
+    if (!EMAIL_RE.test(v)) { errEl.textContent = 'Enter the email address you use for your office.'; errEl.hidden = false; return }
+    if (!p) { errEl.textContent = 'Enter your password.'; errEl.hidden = false; return }
     errEl.hidden = true;
     if (DEMO) return showOffice();
     e.target.classList.add('busy');
-    sb.auth.verifyOtp({ email: pendingEmail, token: c, type: 'email' })
+    sb.auth.signInWithPassword({ email: v, password: p })
       .then(function (r) { if (r.error) throw r.error })
       .catch(function (e2) { errEl.textContent = friendly(e2); errEl.hidden = false })
       .then(function () { e.target.classList.remove('busy') });
   });
-  $('back').addEventListener('click', function () { $('step2').hidden = true; $('step1').hidden = false });
+  $('forgot').addEventListener('click', function () {
+    var v = $('email').value.trim(), errEl = $('emailErr'), okEl = $('emailOk');
+    okEl.hidden = true;
+    if (!EMAIL_RE.test(v)) { errEl.textContent = 'Type your email above first, then tap the reset link.'; errEl.hidden = false; return }
+    errEl.hidden = true;
+    var done = function () { okEl.textContent = 'If that email belongs to this office, a reset link is on its way. Open it on this phone.'; okEl.hidden = false };
+    if (DEMO) return done();
+    sb.auth.resetPasswordForEmail(v, { redirectTo: location.origin + location.pathname })
+      .then(function (r) { if (r.error) throw r.error; done() })
+      .catch(function (e2) { errEl.textContent = friendly(e2); errEl.hidden = false });
+  });
+  $('newPassForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var p = $('newPass').value, errEl = $('newPassErr');
+    if (p.length < 8) { errEl.textContent = 'Use at least 8 characters.'; errEl.hidden = false; return }
+    errEl.hidden = true;
+    if (DEMO) return showOffice();
+    e.target.classList.add('busy');
+    sb.auth.updateUser({ password: p })
+      .then(function (r) { if (r.error) throw r.error; recovering = false; $('newPass').value = ''; showOffice() })
+      .catch(function (e2) { errEl.textContent = friendly(e2); errEl.hidden = false })
+      .then(function () { e.target.classList.remove('busy') });
+  });
   $('signout').addEventListener('click', function () {
     if (DEMO) return showLogin();
     sb.auth.signOut().then(showLogin);
@@ -664,7 +681,9 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
   } else {
     sb.auth.onAuthStateChange(function (event, session) {
       var uid = session && session.user ? session.user.id : null;
-      if (uid && uid !== userId) { userId = uid; setTimeout(showOffice, 0) }
+      if (event === 'PASSWORD_RECOVERY') recovering = true;
+      if (uid && recovering) { userId = uid; setTimeout(showNewPassword, 0) }
+      else if (uid && uid !== userId) { userId = uid; setTimeout(showOffice, 0) }
       else if (!uid && (userId || event === 'INITIAL_SESSION')) { userId = null; TABLES.forEach(function (t) { data[t] = [] }); showLogin() }
     });
   }
