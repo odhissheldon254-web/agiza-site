@@ -75,6 +75,9 @@ end $$;
 
 -- Anonymous visitors get nothing at all.
 revoke all on public.clients, public.meetings, public.quotes, public.todos from anon;
+-- Signed-in users may use the tables; the "owner only" rule above limits them to their own rows.
+-- (Newer Supabase projects no longer grant this automatically.)
+grant select, insert, update, delete on public.clients, public.meetings, public.quotes, public.todos to authenticated;
 
 -- ---------- Private storage for quote PDFs ----------
 -- Files live under quotes/<her user id>/..., and only she can read or write her folder.
