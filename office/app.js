@@ -118,6 +118,8 @@
         { text: 'Call Peter about policy documents', due: day(-2), done: true }
       ]
     };
+    // ?empty shows the office as it looks on her first day, before anything is added.
+    if (/[?&]empty/.test(location.search)) TABLES.forEach(function (t) { db[t] = [] });
     TABLES.forEach(function (t) { db[t].forEach(function (r, i) { r.id = id(); r.created_at = new Date(now - i * 1000).toISOString() }) });
     var copy = function (x) { return JSON.parse(JSON.stringify(x)) };
     return {
@@ -201,13 +203,16 @@
     $('hGreet').textContent = (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ', Agiza';
     $('hDate').textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
     renderNext();
+    renderStart();
 
     var list = needs(), shown = showAllNeeds ? list : list.slice(0, 5);
     $('needN').textContent = list.length;
     $('needN').hidden = !list.length;
     $('needList').innerHTML = shown.map(needRow).join('') +
       (list.length > 5 ? '<button type="button" class="showall" id="needMore">' + (showAllNeeds ? 'Show less' : 'Show all ' + list.length) + '</button>' : '') ||
-      '<div class="calm"><b>All caught up 🌿</b>Nothing is waiting on you. Enjoy the calm.</div>';
+      (isEmpty() ? '<div class="calm"><b>Your office is ready ✨</b>Add your first clients and plans, and what needs you will show up here.' +
+        '<span class="calm-acts"><button type="button" class="act" data-new="clients">Add a client</button>' + (CONTACTS ? '<button type="button" class="act" data-import>From contacts</button>' : '') + '</span></div>'
+        : '<div class="calm"><b>All caught up 🌿</b>Nothing is waiting on you. Enjoy the calm.</div>');
     var hb = $('homeBadge'); hb.textContent = list.length; hb.hidden = !list.length || current === 'home';
 
     var month = todayStr().slice(0, 7);
@@ -215,6 +220,7 @@
     var fu = followUps().length;
     var covered = data.clients.filter(function (c) { return c.status === 'done' && (c.covered_on || '').slice(0, 7) === month }).length;
     var monthName = now.toLocaleDateString('en-GB', { month: 'long' });
+    $('pulse').hidden = isEmpty();
     $('pulse').innerHTML =
       '<a class="tile t-meet" href="#diary"><b data-count="' + todays + '">' + todays + '</b><span>' + (todays === 1 ? 'meeting' : 'meetings') + ' today</span></a>' +
       '<a class="tile t-quote" href="#clients/quotes"><b data-count="' + fu + '">' + fu + '</b><span>' + (fu === 1 ? 'quote' : 'quotes') + ' waiting</span></a>' +
@@ -246,8 +252,9 @@
     if (!next) {
       var tm = meetingsOn(addDays(new Date(), 1))[0];
       $('nextCard').innerHTML = '<p class="lbl">Today</p><p class="empty-next">' +
-        (today.length ? 'That was your last meeting today. Well done.' : 'No meetings today. A good day for follow-ups.') + '</p>' +
-        (tm ? '<p class="after">Tomorrow ' + esc(hm(new Date(tm.starts_at))) + ' · ' + esc(tm.title) + '</p>' : '') + line;
+        (today.length ? 'That was your last meeting today. Well done.' : isEmpty() ? 'Your diary is wide open. Plan your first meeting.' : 'No meetings today. A good day for follow-ups.') + '</p>' +
+        (tm ? '<p class="after">Tomorrow ' + esc(hm(new Date(tm.starts_at))) + ' · ' + esc(tm.title) + '</p>' : '') +
+        '<div class="acts"><button type="button" data-new="meetings">' + icon('plus') + 'Plan a meeting</button></div>' + line;
       return;
     }
     var start = new Date(next.starts_at), c = clientNamed(next.title);
@@ -289,6 +296,7 @@
   function renderClients() {
     $('clientSeg').querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.cs === clientSeg)) });
     $('peopleBox').hidden = clientSeg !== 'people';
+    $('cImport').hidden = !CONTACTS;
     $('quotesBox').hidden = clientSeg !== 'quotes';
     $('cAdd').dataset.new = clientSeg === 'people' ? 'clients' : 'quotes';
     $('cAdd').setAttribute('aria-label', clientSeg === 'people' ? 'Add a client' : 'Add a quote');
@@ -357,6 +365,64 @@
     if (done.length) html += '<button type="button" class="donebtn" id="doneToggle">' + (showDone ? 'Hide finished' : 'Show ' + done.length + ' finished') + '</button>' +
       (showDone ? '<div class="stack">' + done.map(todoRow).join('') + '</div>' : '');
     $('todoGroups').innerHTML = html;
+  }
+
+  /* ---------- first day: welcome, "Get started" steps, import from phone contacts ---------- */
+  function isEmpty() { return !TABLES.some(function (t) { return data[t].length }) }
+  // Small per-phone memory (which steps she has seen); the office works the same without it.
+  function remember(k, v) { try { if (v === undefined) return localStorage.getItem('agiza-' + k); localStorage.setItem('agiza-' + k, v) } catch (_) { return null } }
+  var CONTACTS = 'contacts' in navigator && 'ContactsManager' in window;
+  var STEPS = [
+    { k: 'client', t: 'Add your first clients', d: 'Type them in, or pick them from your phone contacts.', done: function () { return data.clients.length > 0 },
+      acts: function () { return '<button type="button" class="act" data-new="clients">Add</button>' + (CONTACTS ? '<button type="button" class="act" data-import>From contacts</button>' : '') } },
+    { k: 'plan', t: 'Plan a meeting or a to-do', d: 'Your next meeting will appear in the dark card above.', done: function () { return data.meetings.length + data.todos.length > 0 },
+      acts: function () { return '<button type="button" class="act" data-new="meetings">Meeting</button><button type="button" class="act" data-new="todos">To-do</button>' } },
+    { k: 'remind', t: 'Turn on phone reminders', d: 'A buzz before meetings and at to-do times.', done: function () { return remindersOn || (!DEMO && !PUSH) },
+      acts: function () { return '<button type="button" class="act" data-more>Turn on</button>' } },
+    { k: 'ask', t: 'Say hi to Ask Agiza', d: 'Try: "Remind me to call Grace tomorrow at 10".', done: function () { return remember('asked') === '1' },
+      acts: function () { return '<button type="button" class="act" data-ask>Try it</button>' } }
+  ];
+  function renderStart() {
+    var box = $('start');
+    if (remember('start-done') === '1') { box.hidden = true; return }
+    var n = STEPS.filter(function (st) { return st.done() }).length;
+    if (n === STEPS.length) {
+      box.hidden = true;
+      remember('start-done', '1');
+      if (box.dataset.shown && window.AgizaAssistant && AgizaAssistant.celebrate) AgizaAssistant.celebrate('✨ Your office is all set, Agiza. Enjoy it!');
+      return;
+    }
+    box.hidden = false; box.dataset.shown = '1';
+    $('startRing').style.setProperty('--p', n / STEPS.length);
+    $('startRing').textContent = n + '/' + STEPS.length;
+    $('steps').innerHTML = STEPS.map(function (st) {
+      var ok = st.done();
+      return '<li class="' + (ok ? 'ok' : '') + '"><span class="bul">' + (ok ? icon('tick') : '') + '</span><div><b>' + st.t + '</b>' +
+        (ok ? '' : '<small>' + st.d + '</small><span class="sacts">' + st.acts() + '</span>') + '</div></li>';
+    }).join('');
+  }
+  $('startX').addEventListener('click', function () { remember('start-done', '1'); $('start').hidden = true });
+
+  // Pick several people from the phone's contacts and add them as new clients in one go.
+  function importContacts() {
+    navigator.contacts.select(['name', 'tel'], { multiple: true }).then(function (picked) {
+      var have = {};
+      data.clients.forEach(function (c) { have[(c.name || '').toLowerCase()] = 1; if (c.phone) have[String(c.phone).replace(/\D/g, '').slice(-9)] = 1 });
+      var rows = (picked || []).map(function (p) {
+        return { name: ((p.name && p.name[0]) || '').trim().slice(0, 120), phone: ((p.tel && p.tel[0]) || '').replace(/[^\d+]/g, '').slice(0, 30) || null, status: 'new' };
+      }).filter(function (r) { return r.name && !have[r.name.toLowerCase()] && !(r.phone && have[r.phone.replace(/\D/g, '').slice(-9)]) });
+      if (!rows.length) return toast(picked && picked.length ? 'Those contacts are already in your office.' : 'No contacts picked.');
+      return rows.reduce(function (chain, r) { return chain.then(function () { return api.insert('clients', r) }) }, Promise.resolve())
+        .then(function () { return reload('clients') })
+        .then(function () { toast('Added ' + rows.length + (rows.length === 1 ? ' client' : ' clients') + ' ✨') });
+    }).catch(function (e) { if (e && e.name !== 'AbortError') toast(friendly(e), true) });
+  }
+
+  // The first time she opens her office on a phone: a small welcome moment.
+  function welcome() {
+    if (remember('welcomed') === '1') return;
+    remember('welcomed', '1');
+    setTimeout(function () { if (window.AgizaAssistant && AgizaAssistant.celebrate) AgizaAssistant.celebrate('Karibu, Agiza! 🌸 Your office is ready.') }, 700);
   }
 
   /* ---------- pages: routing, sliding transitions, cards rising in turn ---------- */
@@ -584,6 +650,9 @@
         .catch(function (e2) { if (w) w.close(); toast(friendly(e2), true) });
       return;
     }
+    if (el.closest('[data-import]')) return importContacts();
+    if (el.closest('[data-more]')) { closeSheets(); return $('moreSheet').showModal() }
+    if (el.closest('[data-ask]')) return $('askBtn').click();
     var tb = el.closest('[data-tick]'); if (tb) return tick(tb);
     var ub = el.closest('[data-untick]');
     if (ub) return api.update('todos', ub.dataset.untick, { done: false }).then(function () { return reload('todos') }).catch(function (e2) { toast(friendly(e2), true) });
@@ -608,6 +677,7 @@
     if (open) { $('factBox').classList.remove('open'); void $('factBox').offsetWidth; $('factBox').classList.add('open') }
   });
   $('addBtn').addEventListener('click', function () { closeSheets(); $('addSheet').showModal() });
+  $('askBtn').addEventListener('click', function () { if (remember('asked') !== '1') { remember('asked', '1'); setTimeout(renderStart, 400) } });
   $('meBtn').addEventListener('click', function () { closeSheets(); $('moreSheet').showModal() });
   $('nudge').addEventListener('click', function () { $('moreSheet').showModal() });
   $('newsTeaser').addEventListener('click', function () { $('moreSheet').showModal() });
@@ -649,6 +719,7 @@
     $('remindBtn').hidden = !btn; $('remindBtn').textContent = btn || '';
     $('remindRow').classList.toggle('on', !!on);
     remindersOn = !!on;
+    if (!$('office').hidden) renderStart();
     $('nudge').hidden = DEMO || on || !PUSH || Notification.permission === 'denied';
     $('chimeRow').hidden = !on || STANDALONE || IOS_TAB;
     updateDot();
@@ -717,7 +788,7 @@
   /* ---------- sign in / out ---------- */
   function showOffice() {
     $('login').hidden = true; $('office').hidden = false;
-    loadAll().then(function () { if (!current) route() });
+    loadAll().then(function () { if (!current) route(); welcome() });
     refreshReminders(); showInstall();
   }
   function showLogin() { $('office').hidden = true; $('login').hidden = false; $('step2').hidden = true; $('step1').hidden = false; $('password').value = ''; closeSheets() }

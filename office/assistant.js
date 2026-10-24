@@ -557,5 +557,5 @@
   $('aiSpeak').addEventListener('change', function () { try { localStorage.setItem('agiza-speak', this.checked ? '1' : '0') } catch (_) {} });
 
   // Exposed for testing in the browser console.
-  window.AgizaAssistant = { parseWhen: parseWhen, understand: understand, handle: handle };
+  window.AgizaAssistant = { parseWhen: parseWhen, understand: understand, handle: handle, celebrate: celebrate };
 })();
