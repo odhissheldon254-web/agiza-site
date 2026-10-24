@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "ke.co.odhis.agiza.office",
+    "sha256_cert_fingerprints": ["B6:2C:8F:75:78:E0:7E:60:86:73:82:10:46:5E:AD:19:2E:98:15:94:70:DF:20:52:68:FC:AD:91:23:BC:27:04"]
+  }
+}]

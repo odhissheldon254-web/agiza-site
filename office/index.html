@@ -74,6 +74,7 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .remind.on { border-left-color: var(--ok); color: var(--soft) }
 .remind button { background: var(--ink); color: var(--paper); border: 0; border-radius: 3px; padding: 8px 14px; cursor: pointer; white-space: nowrap }
 .remind button.link { background: none; color: var(--rose); padding: 0 }
+.remind .btn-like { background: var(--ink); color: var(--paper); border-radius: 3px; padding: 8px 14px; text-decoration: none; white-space: nowrap }
 .ghost { background: none; border: 1px solid var(--line); border-radius: 3px; padding: 7px 12px; cursor: pointer; font-size: 13px }
 .page { max-width: 1180px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px }
 .hello h1 { font-family: var(--disp); font-size: clamp(32px, 4vw, 44px); line-height: 1.1 }
@@ -238,7 +239,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     <div class="hello">
       <h1 id="greet">Hello, Agiza</h1>
       <p id="today"></p>
-      <div class="remind" id="installBar" hidden><span>📲 Install Agiza Office on this phone, so it opens like an app.</span><button type="button" id="installBtn">Install</button></div>
+      <div class="remind" id="installBar" hidden><span>📲 Install Agiza Office on this phone, so it opens like an app.</span><button type="button" id="installBtn">Install</button><a class="btn-like" id="apkLink" href="agiza-office.apk" download hidden>Download app</a></div>
       <div class="remind" id="remindBar" hidden><span id="remindText"></span><span><a id="chimeLink" href="agiza-chime.wav" download="Agiza chime.wav" hidden style="color:var(--rose);margin-right:14px">Get the reminder sound</a><button type="button" id="remindBtn" hidden></button></span></div>
     </div>
 
@@ -665,7 +666,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     $('remindText').textContent = text;
     $('remindBtn').hidden = !btn; $('remindBtn').textContent = btn || '';
     $('remindBtn').className = on ? 'link' : '';
-    $('chimeLink').hidden = !on || IOS_TAB;
+    $('chimeLink').hidden = !on || IOS_TAB || STANDALONE;
   }
   // Shows the right message, and re-saves this phone's subscription in case the browser renewed it.
   function refreshReminders() {
@@ -698,17 +699,22 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
   // Chrome offers installation through this event; keep it for the Install button.
   // Phones get the bar even before Chrome offers the prompt (it waits until she has used the page a little),
   // with menu instructions instead of the button. It hides once the office runs as the installed app.
+  // On Android the office offers its own app (agiza-office.apk), which also carries the Agiza chime.
   var installPrompt = window.__installPrompt || null;
   var STANDALONE = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   var PHONE = matchMedia('(pointer: coarse)').matches;
+  var ANDROID = /Android/i.test(navigator.userAgent);
   function showInstall() {
     var bar = $('installBar');
     if (DEMO || STANDALONE || IOS_TAB || (!installPrompt && !PHONE)) { bar.hidden = true; return }
     bar.hidden = false;
-    $('installBtn').hidden = !installPrompt;
-    bar.querySelector('span').textContent = installPrompt
-      ? '📲 Install Agiza Office on this phone, so it opens like an app.'
-      : '📲 To install Agiza Office as an app: in Chrome, tap ⋮ (top right), then "Install app" or "Add to Home screen", then Install.';
+    $('apkLink').hidden = !ANDROID;
+    $('installBtn').hidden = ANDROID || !installPrompt;
+    bar.querySelector('span').textContent = ANDROID
+      ? '📲 Get the Agiza Office app: reminders come with their own chime. If your phone asks, allow installing from this source.'
+      : installPrompt
+        ? '📲 Install Agiza Office on this phone, so it opens like an app.'
+        : '📲 To install Agiza Office as an app: in Chrome, tap ⋮ (top right), then "Install app" or "Add to Home screen", then Install.';
   }
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); installPrompt = e; showInstall() });
   window.addEventListener('appinstalled', function () { installPrompt = null; showInstall(); toast('Installed. Open Agiza Office from your home screen.') });
