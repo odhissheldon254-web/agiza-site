@@ -509,31 +509,62 @@
 
   /* ---------- voice: speech to text in, text to speech out ---------- */
   var Rec = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, listening = false;
-  if (!Rec) $('aiMic').hidden = true;
-  $('aiMic').addEventListener('click', function () {
-    if (listening) { rec.stop(); return }
-    stopSpeaking();
+  // Kenyan English first; phones whose speech engine lacks it fall back to British, then American English.
+  // The one that works is remembered on this phone.
+  var LANGS = ['en-KE', 'en-GB', 'en-US'], langIdx = 0;
+  try { var savedLang = Number(localStorage.getItem('agiza-voice-lang')); if (savedLang > 0 && savedLang < LANGS.length) langIdx = savedLang } catch (_) {}
+  var KEYBOARD_TIP = 'You can always tap the message box and use the 🎤 on your keyboard instead.';
+  var VOICE_ERRORS = {
+    'not-allowed': 'The microphone is blocked for this office. In Chrome, tap the icon left of the address › Permissions › Microphone › Allow. Also check Settings › Apps › Chrome › Permissions › Microphone.',
+    'service-not-allowed': 'Your phone\'s speech service is switched off. Check that "Speech Services by Google" is installed and enabled in Settings › Apps.',
+    'audio-capture': 'I can\'t reach the microphone. Another app may be using it, or Chrome has no microphone access in Settings › Apps › Chrome › Permissions.',
+    'no-speech': 'I didn\'t hear anything. Tap 🎤, wait for it to turn red, then speak.',
+    'network': 'Voice could not reach Google\'s speech service. Check your internet. (Some computers, such as Linux laptops, cannot do voice typing in Chrome at all.)',
+    'language-not-supported': 'This phone\'s speech engine does not support English voice typing.',
+    'aborted': null
+  };
+  var PLACEHOLDER = input.placeholder;
+  function listen() {
+    var finalText = '', heard = false, retry = false;
     rec = new Rec();
-    rec.lang = 'en-KE'; rec.interimResults = true; rec.maxAlternatives = 1;
-    var finalText = '';
+    rec.lang = LANGS[langIdx]; rec.interimResults = true; rec.maxAlternatives = 1;
     rec.onresult = function (e) {
       var interim = '';
+      heard = true;
       for (var i = e.resultIndex; i < e.results.length; i++) {
         if (e.results[i].isFinal) finalText += e.results[i][0].transcript; else interim += e.results[i][0].transcript;
       }
       input.value = finalText + interim;
     };
     rec.onerror = function (e) {
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') say('To use voice, allow the microphone for this office when your phone asks (or in its settings).');
-      else if (e.error === 'no-speech') say('I didn\'t hear anything. Tap 🎤 and speak after it turns red.');
-      else if (e.error === 'network') say('Voice needs an internet connection. You can type instead.');
+      if (e.error === 'language-not-supported' && langIdx < LANGS.length - 1) {
+        langIdx++; retry = true;
+        try { localStorage.setItem('agiza-voice-lang', String(langIdx)) } catch (_) {}
+        return;
+      }
+      var msg = VOICE_ERRORS.hasOwnProperty(e.error) ? VOICE_ERRORS[e.error] : 'Voice did not start (' + e.error + ').';
+      if (msg) say(esc(msg) + '<br><small>' + esc(KEYBOARD_TIP) + '</small>');
     };
     rec.onend = function () {
-      listening = false; $('aiMic').classList.remove('on');
+      listening = false; $('aiMic').classList.remove('on'); input.placeholder = PLACEHOLDER;
+      if (retry) return listen();
+      // Some phones end with only a partial result; use whatever was heard.
       var said = input.value.trim();
-      if (finalText.trim() && said) { input.value = ''; handle(said, true) }
+      if (heard && said) { input.value = ''; handle(said, true) }
     };
-    try { rec.start(); listening = true; $('aiMic').classList.add('on') } catch (_) { listening = false }
+    try {
+      rec.start(); listening = true; $('aiMic').classList.add('on'); input.placeholder = 'Listening… speak now';
+    } catch (err) {
+      listening = false;
+      say('Voice could not start: ' + esc(err.message) + '<br><small>' + esc(KEYBOARD_TIP) + '</small>');
+    }
+  }
+  $('aiMic').addEventListener('click', function () {
+    if (!Rec) return say('Voice typing is not available in this browser. Open the office in Chrome, or use the 🎤 on your keyboard.');
+    if (listening) { rec.stop(); return }
+    stopSpeaking();
+    input.value = '';
+    listen();
   });
 
   var voice = null;
