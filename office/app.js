@@ -255,10 +255,10 @@
     var acts = '';
     if (c && c.phone) acts += '<a href="' + esc(waLink(c.phone)) + '" target="_blank" rel="noopener">' + icon('wa') + 'WhatsApp</a>';
     if (next.place && !callish) acts += '<a href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(next.place) + '" target="_blank" rel="noopener">' + icon('pin') + 'Directions</a>';
-    acts += '<button type="button" data-edit="meetings" data-id="' + esc(next.id) + '">Details</button>';
     $('nextCard').innerHTML =
-      '<p class="lbl"><span class="live"></span>' + (live ? 'Now · ends ' + esc(hm(new Date(end(next)))) : 'Next up · ' + esc(until(start - now))) + '</p>' +
-      '<div class="row"><span class="big">' + esc(hm(start)) + '</span><div><p class="who">' + esc(next.title) + '</p>' +
+      '<p class="lbl"><span class="live"></span>' + (live ? 'Now · ends ' + esc(hm(new Date(end(next)))) : 'Next up · ' + esc(until(start - now))) +
+      '<button type="button" class="det" data-edit="meetings" data-id="' + esc(next.id) + '">Details ›</button></p>' +
+      '<div class="row" data-edit="meetings" data-id="' + esc(next.id) + '"><span class="big">' + esc(hm(start)) + '</span><div><p class="who">' + esc(next.title) + '</p>' +
       (next.place ? '<p class="where">' + esc(next.place) + '</p>' : '') + '</div></div>' +
       '<div class="acts">' + acts + '</div>' + line;
   }
@@ -307,7 +307,7 @@
       var wa = waLink(c.phone);
       var sub = [c.plan, c.status === 'done' && c.covered_on ? 'covered ' + shortDate(c.covered_on) : c.note].filter(Boolean).map(esc).join(' · ');
       return '<div class="person rv" data-edit="clients" data-id="' + esc(c.id) + '"><span class="av ' + esc(c.status) + '">' + esc((c.name || '?').charAt(0).toUpperCase()) + '</span>' +
-        '<div><b>' + esc(c.name) + '</b><small><span class="pill ' + esc(c.status) + '">' + esc(STATUS[c.status]) + '</span> ' + sub + '</small></div>' +
+        '<div><b>' + esc(c.name) + '</b><small><span class="st st-' + esc(c.status) + '">' + esc(STATUS[c.status]) + '</span>' + (sub ? ' · ' + sub : '') + '</small></div>' +
         (wa ? '<a class="wa-ic" href="' + esc(wa) + '" target="_blank" rel="noopener" aria-label="WhatsApp ' + esc(c.name) + '">' + icon('wa') + '</a>' : '<span></span>') + '</div>';
     }).join('') || '<div class="calm"><b>' + (q ? 'No match' : 'No one here yet') + '</b>' + (q ? 'Try another name or plan.' : 'Tap + to add a client.') + '</div>';
 

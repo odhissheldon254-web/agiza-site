@@ -81,6 +81,8 @@
     var p = $('moodCheer'); p.classList.remove('swap'); void p.offsetWidth; p.classList.add('swap');
   });
   document.addEventListener('agiza:render', renderMood);
+  // The office may already have drawn itself before this file loaded, so fill the line in now too.
+  renderMood();
 
   /* ---------- celebrations ---------- */
   var celebrateTimer;
@@ -129,6 +131,7 @@
   var newsCache = [];
   var newsLoaded = false;
   document.addEventListener('agiza:render', function () { if (!newsLoaded) { newsLoaded = true; loadNews() } });
+  if (!$('office').hidden && !newsLoaded) { newsLoaded = true; loadNews() }
 
   /* ---------- understanding dates and times ---------- */
   var MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
