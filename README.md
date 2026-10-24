@@ -59,3 +59,9 @@ Setup, already done for her project:
 2. **Edge Functions:** deploy `supabase/functions/reminders/index.ts` as a function named `reminders`, keeping "Verify JWT" on.
 
 pg_cron calls the function every minute. On its first run it creates the push keys and publishes the public half in `push_config`.
+
+### Agiza Assistant, mood card and news
+
+- **Agiza Assistant:** the "✨ Ask Agiza" button opens a helper. She can type or tap 🎤 to speak, for example "Remind me to call Wanjiru tomorrow at 10", "Meeting with Brian on Friday at 2pm at Sarit" or "What do I have today?". It understands simple English and some Swahili (kesho, leo, saa nne), and always shows a card to confirm before saving. It is rule-based and runs in the browser (`office/assistant.js`); no AI service is involved.
+- **Mood card:** the greeting changes for morning, afternoon and evening, and comes with a daily encouragement and a "Did you know?" fact. Celebrations pop up when a client is covered, a quote is accepted or all to-dos are done. All the words live in `office/cheer.js` and can be edited freely.
+- **Insurance news:** Kenyan insurance headlines (title, source and link only), collected every 3 hours by the `news` Edge Function. Setup: run `supabase/news.sql`, then deploy `supabase/functions/news/index.ts` as `news`, keeping "Verify JWT" on.

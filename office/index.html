@@ -75,6 +75,52 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .remind button { background: var(--ink); color: var(--paper); border: 0; border-radius: 3px; padding: 8px 14px; cursor: pointer; white-space: nowrap }
 .remind button.link { background: none; color: var(--rose); padding: 0 }
 .remind .btn-like { background: var(--ink); color: var(--paper); border-radius: 3px; padding: 8px 14px; text-decoration: none; white-space: nowrap }
+/* ---------- mood card, news, assistant, celebrations ---------- */
+.mood { margin-top: 18px; padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 4px; display: grid; gap: 8px; font-size: 14px }
+.mood-line { font-weight: 500 }
+.mood-cheer { font-family: var(--disp); font-size: 20px; line-height: 1.35; font-style: italic; color: var(--ink) }
+.mood-fact { color: var(--soft) }
+.mood-fact b { color: var(--gold); font-weight: 500 }
+.mood .link { font-family: var(--body); font-style: normal; font-size: 13px; background: none; border: 0; padding: 0; color: var(--rose); cursor: pointer; text-decoration: underline; text-underline-offset: 3px }
+.news { display: grid; gap: 2px; padding: 12px 18px; border-top: 1px solid var(--line); color: inherit; text-decoration: none }
+.news:first-child { border-top: 0 }
+.news b { font-weight: 500; font-size: 14px; line-height: 1.4 }
+.news small { color: var(--soft); font-size: 12px }
+.news:hover b { color: var(--rose) }
+.ask { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--ink); color: var(--paper); border: 0; border-radius: 99px; padding: 14px 20px; font-weight: 500; cursor: pointer; box-shadow: 0 12px 30px -10px rgba(45,22,48,.55) }
+#office .page { padding-bottom: 96px }
+dialog.ai { width: min(560px, calc(100% - 32px)) }
+.ai-wrap { display: flex; flex-direction: column; gap: 10px; padding: 18px 18px calc(16px + env(safe-area-inset-bottom, 0px)); height: min(680px, 88dvh) }
+.ai-log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 2px }
+.msg { max-width: 88%; padding: 10px 14px; border-radius: 14px; font-size: 15px; line-height: 1.45; overflow-wrap: anywhere }
+.msg.me { align-self: flex-end; background: var(--ink); color: var(--paper); border-bottom-right-radius: 4px }
+.msg.bot { align-self: flex-start; background: var(--card); border: 1px solid var(--line); border-bottom-left-radius: 4px }
+.msg .tips { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px }
+.msg a { color: var(--rose) }
+.msg small { color: var(--soft) }
+.msg .late { color: var(--rose) }
+.card { display: grid; gap: 4px }
+.card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px }
+.card-actions button { border: 1px solid var(--line); background: var(--paper); border-radius: 3px; padding: 8px 12px; cursor: pointer; font-size: 14px }
+.card-actions .pri-s { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.card-actions button:disabled { opacity: .45; cursor: default }
+.card.saved b::after { content: " ✓"; color: var(--ok) }
+.ai-chips { display: flex; gap: 6px; overflow-x: auto; flex: none; padding-bottom: 2px; scrollbar-width: none }
+.ai-chips button { flex: none; border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: 7px 12px; font-size: 13px; cursor: pointer; white-space: nowrap }
+.sheet .ai-form { display: flex; gap: 8px; flex: none; padding: 0 }
+.ai-form .field { flex: 1; min-width: 0 }
+.ai-form button { flex: none; width: 48px; border: 1px solid var(--line); background: var(--card); border-radius: 3px; font-size: 18px; cursor: pointer }
+.ai-form .send { background: var(--ink); color: var(--paper); border-color: var(--ink) }
+.ai-form .mic.on { background: var(--rose); border-color: var(--rose); animation: pulse 1.2s ease-in-out infinite }
+@keyframes pulse { 50% { box-shadow: 0 0 0 8px rgba(168,69,95,.18) } }
+.ai-speak { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--soft); font-weight: 400; margin: 0 }
+.celebrate { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: rgba(45,22,48,.35); cursor: pointer; padding: 16px }
+.celebrate p { position: relative; z-index: 1; background: var(--card); border-radius: 10px; padding: 22px 26px; max-width: 420px; text-align: center;
+  font-family: var(--disp); font-size: 26px; line-height: 1.3; box-shadow: 0 30px 60px -20px rgba(45,22,48,.5) }
+.confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none }
+.confetti span { position: absolute; top: -40px; font-size: 26px; animation: fall 2.8s ease-in forwards }
+@keyframes fall { to { transform: translateY(110vh) rotate(320deg) } }
 .ghost { background: none; border: 1px solid var(--line); border-radius: 3px; padding: 7px 12px; cursor: pointer; font-size: 13px }
 .page { max-width: 1180px; margin: 0 auto; padding-block: 32px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 28px }
 .hello h1 { font-family: var(--disp); font-size: clamp(32px, 4vw, 44px); line-height: 1.1 }
@@ -184,7 +230,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
 </head>
 <body>
 
-<div class="sample" id="demoBar" hidden>DEMO · sample data only, nothing is saved · any 6-digit code works</div>
+<div class="sample" id="demoBar" hidden>DEMO · sample data only, nothing is saved · any email and password work</div>
 
 <!-- ================= LOGIN ================= -->
 <div id="login" class="login" hidden>
@@ -239,6 +285,11 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     <div class="hello">
       <h1 id="greet">Hello, Agiza</h1>
       <p id="today"></p>
+      <div class="mood" id="mood" hidden>
+        <p class="mood-line" id="moodLine"></p>
+        <p class="mood-cheer"><span id="moodCheer"></span> <button type="button" class="link" id="moodNext">Another</button></p>
+        <p class="mood-fact"><b>💡 Did you know?</b> <span id="moodFact"></span> <button type="button" class="link" id="factNext">Another</button></p>
+      </div>
       <div class="remind" id="installBar" hidden><span>📲 Install Agiza Office on this phone, so it opens like an app.</span><button type="button" id="installBtn">Install</button><a class="btn-like" id="apkLink" href="agiza-office.apk" download hidden>Download app</a></div>
       <div class="remind" id="remindBar" hidden><span id="remindText"></span><span><a id="chimeLink" href="agiza-chime.wav" download="Agiza chime.wav" hidden style="color:var(--rose);margin-right:14px">Get the reminder sound</a><button type="button" id="remindBtn" hidden></button></span></div>
     </div>
@@ -282,10 +333,33 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
           <h2>Coming up <button class="add" type="button" data-new="meetings">+ Add</button></h2>
           <div class="list" id="weekList"></div>
         </section>
+
+        <section class="panel" id="newsPanel" hidden>
+          <h2>Insurance news</h2>
+          <div class="list" id="newsList"></div>
+          <p class="panel-note">Headlines from Kenyan news sites, updated every few hours.</p>
+        </section>
       </div>
     </div>
   </main>
+  <button class="ask" id="askBtn" type="button" aria-label="Open Agiza Assistant">✨ Ask Agiza</button>
 </div>
+
+<dialog class="sheet ai" id="aiSheet" aria-label="Agiza Assistant">
+  <div class="ai-wrap">
+    <h2>Agiza Assistant <button type="button" id="aiClose" aria-label="Close">×</button></h2>
+    <div class="ai-log" id="aiLog" aria-live="polite"></div>
+    <div class="ai-chips" id="aiChips"></div>
+    <form class="ai-form" id="aiForm" autocomplete="off">
+      <input class="field" id="aiInput" placeholder="Type, or tap the mic and speak…" aria-label="Message" maxlength="300">
+      <button type="button" class="mic" id="aiMic" aria-label="Speak">🎤</button>
+      <button type="submit" class="send" aria-label="Send">➤</button>
+    </form>
+    <label class="ai-speak" id="aiSpeakRow"><input type="checkbox" id="aiSpeak"> Read answers aloud</label>
+  </div>
+</dialog>
+
+<div class="celebrate" id="celebrate" hidden role="status"><div class="confetti" id="confetti" aria-hidden="true"></div><p id="celebrateText"></p></div>
 
 <dialog class="sheet" id="sheet"><form id="sheetForm" method="dialog" novalidate></form></dialog>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -484,7 +558,10 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
         '</label><button type="button" class="edit" data-edit="todos" data-id="' + esc(t.id) + '" aria-label="Edit">Edit</button></li>';
     }).join('') + (closed.length > 3 ? '<li style="padding:0"><button type="button" class="more" id="moreDone">' + (showAllDone ? 'Hide finished' : 'Show all ' + closed.length + ' finished') + '</button></li>' : '')
       || '<li class="empty">Nothing to do. Add your first to-do below.</li>';
+    emit('render');
   }
+  // assistant.js listens for these: "render" after every redraw, "saved" after a change.
+  function emit(type, detail) { document.dispatchEvent(new CustomEvent('agiza:' + type, { detail: detail || {} })) }
 
   /* ---------- add / edit sheet ---------- */
   var PLANS = ['Whole life cover', 'Education', 'Savings & investment', 'Health'];
@@ -538,11 +615,12 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
   }
 
   var editing = null;
-  function openSheet(table, row) {
+  // prefill: values for a new item (the assistant's "Change" button), without making it an edit.
+  function openSheet(table, row, prefill) {
     editing = { table: table, row: row || null };
-    var spec = FORMS[table], v = Object.assign({}, row || {});
+    var spec = FORMS[table], v = Object.assign({}, row || prefill || {});
     if (table === 'meetings') {
-      var d = row ? new Date(row.starts_at) : (function () { var x = new Date(); x.setMinutes(0, 0, 0); x.setHours(x.getHours() + 1); return x })();
+      var d = v.starts_at ? new Date(v.starts_at) : (function () { var x = new Date(); x.setMinutes(0, 0, 0); x.setHours(x.getHours() + 1); return x })();
       v._date = dayStr(d); v._time = hm(d); v.duration_min = String(v.duration_min || 30); v.kind = v.kind || 'new';
       v.remind_min = String(v.remind_min != null ? v.remind_min : 30);
     }
@@ -595,6 +673,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     if (file) chain = api.upload(file).then(function (path) { row.pdf_path = path; if (old && old.pdf_path) return api.removeFile(old.pdf_path) });
     chain.then(function () { return old ? api.update(t, old.id, row) : api.insert(t, row) })
       .then(function () { $('sheet').close(); toast('Saved'); return reload(t) })
+      .then(function () { emit('saved', { table: t, row: row, old: old }) })
       .catch(function (e2) { err.textContent = friendly(e2); err.hidden = false })
       .then(function () { form.classList.remove('busy') });
   });
@@ -635,7 +714,8 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
   $('office').addEventListener('change', function (e) {
     var id = e.target.dataset.toggle; if (!id) return;
     var done = e.target.checked;
-    api.update('todos', id, { done: done }).then(function () { return reload('todos') }).catch(function (e2) { e.target.checked = !done; toast(friendly(e2), true) });
+    api.update('todos', id, { done: done }).then(function () { return reload('todos') })
+      .then(function () { emit('saved', { table: 'todos', row: { done: done }, old: { done: !done } }) }).catch(function (e2) { e.target.checked = !done; toast(friendly(e2), true) });
   });
   $('todoQuick').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -644,6 +724,13 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     api.insert('todos', { text: text }).then(function () { input.value = ''; return reload('todos') })
       .catch(function (e2) { toast(friendly(e2), true) }).then(function () { input.disabled = false; input.focus() });
   });
+
+  /* ---------- bridge for assistant.js (helper, mood card, celebrations, news) ---------- */
+  window.AgizaOffice = {
+    get data() { return data },
+    DEMO: DEMO, sb: sb, api: api, reload: reload, openSheet: openSheet,
+    toast: toast, friendly: friendly, esc: esc, hm: hm, dayStr: dayStr, todayStr: todayStr, waLink: waLink
+  };
 
   /* ---------- phone reminders (web push, sent by the "reminders" Edge Function) ---------- */
   var PUSH = !DEMO && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -798,5 +885,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
   document.addEventListener('visibilitychange', function () { if (!document.hidden && !$('office').hidden) loadAll() });
 })();
 </script>
+<script src="cheer.js"></script>
+<script src="assistant.js"></script>
 </body>
 </html>
