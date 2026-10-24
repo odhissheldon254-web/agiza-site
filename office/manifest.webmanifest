@@ -1,13 +1,16 @@
 {
+  "id": "/office/",
   "name": "Agiza Office",
-  "short_name": "Office",
-  "start_url": "./",
-  "scope": "./",
+  "short_name": "Agiza Office",
+  "description": "Lorrain Agiza Odungu's private office: clients, meetings, quotes and to-dos.",
+  "start_url": "/office/",
+  "scope": "/office/",
   "display": "standalone",
   "background_color": "#fbf3f2",
   "theme_color": "#2d1630",
   "icons": [
-    { "src": "../images/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "../images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/images/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

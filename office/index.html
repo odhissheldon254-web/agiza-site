@@ -8,6 +8,7 @@
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../images/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
+<script>window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.__installPrompt = e })</script>
 <meta name="apple-mobile-web-app-title" content="Agiza Office">
 <title>Agiza Office</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -237,6 +238,7 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     <div class="hello">
       <h1 id="greet">Hello, Agiza</h1>
       <p id="today"></p>
+      <div class="remind" id="installBar" hidden><span>📲 Install Agiza Office on this phone, so it opens like an app.</span><button type="button" id="installBtn">Install</button></div>
       <div class="remind" id="remindBar" hidden><span id="remindText"></span><button type="button" id="remindBtn" hidden></button></div>
     </div>
 
@@ -692,6 +694,18 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
       .catch(function (e) { toast(e.message === 'not allowed' ? 'Reminders need notification permission.' : friendly(e), true) })
       .then(function () { btn.disabled = false; refreshReminders() });
   });
+  // Chrome offers installation through this event; keep it for the Install button.
+  var installPrompt = window.__installPrompt || null;
+  function showInstall() { $('installBar').hidden = !installPrompt || DEMO }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); installPrompt = e; showInstall() });
+  window.addEventListener('appinstalled', function () { installPrompt = null; showInstall(); toast('Installed. Open Agiza Office from your home screen.') });
+  $('installBtn').addEventListener('click', function () {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    installPrompt.userChoice.then(function () { installPrompt = null; showInstall() });
+  });
+  showInstall();
+
   // On sign-out, stop sending reminders to this phone.
   function forgetPhone() {
     if (!PUSH) return Promise.resolve();
