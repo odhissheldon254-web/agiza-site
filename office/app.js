@@ -204,6 +204,7 @@
     $('hDate').textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
     renderNext();
     renderStart();
+    updateNudge();
 
     var list = needs(), shown = showAllNeeds ? list : list.slice(0, 5);
     $('needN').textContent = list.length;
@@ -382,6 +383,8 @@
     { k: 'ask', t: 'Say hi to Ask Agiza', d: 'Try: "Remind me to call Grace tomorrow at 10".', done: function () { return remember('asked') === '1' },
       acts: function () { return '<button type="button" class="act" data-ask>Try it</button>' } }
   ];
+  // The reminders nudge shows only once the Get started card (which has the same step) is gone.
+  function updateNudge() { $('nudge').hidden = DEMO || remindersOn || !PUSH || Notification.permission === 'denied' || !$('start').hidden }
   function renderStart() {
     var box = $('start');
     if (remember('start-done') === '1') { box.hidden = true; return }
@@ -401,7 +404,7 @@
         (ok ? '' : '<small>' + st.d + '</small><span class="sacts">' + st.acts() + '</span>') + '</div></li>';
     }).join('');
   }
-  $('startX').addEventListener('click', function () { remember('start-done', '1'); $('start').hidden = true });
+  $('startX').addEventListener('click', function () { remember('start-done', '1'); $('start').hidden = true; updateNudge() });
 
   // Pick several people from the phone's contacts and add them as new clients in one go.
   function importContacts() {
@@ -453,26 +456,23 @@
   function showView(name) {
     if (name === current) return;
     var from = current, dir = from && VIEWS.indexOf(name) < VIEWS.indexOf(from) ? 'back' : 'fwd';
-    var swap = function () {
-      VIEWS.forEach(function (v) { $('v-' + v).hidden = v !== name });
-      document.querySelectorAll('[data-tab]').forEach(function (t) {
-        if (t.dataset.tab === name) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
-      });
-      current = name;
-      $('addBtn').hidden = name !== 'home';
-      window.scrollTo(0, 0);
-      var hb = $('homeBadge'); hb.hidden = name === 'home' || !Number(hb.textContent);
-      reveal($('v-' + name), !from || !document.startViewTransition);
-    };
-    document.documentElement.dataset.dir = dir;
-    if (from && document.startViewTransition && !REDUCED) document.startViewTransition(swap);
-    else swap();
+    VIEWS.forEach(function (v) { $('v-' + v).hidden = v !== name });
+    document.querySelectorAll('[data-tab]').forEach(function (t) {
+      if (t.dataset.tab === name) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
+    });
+    current = name;
+    $('addBtn').hidden = name !== 'home';
+    window.scrollTo(0, 0);
+    var hb = $('homeBadge'); hb.hidden = name === 'home' || !Number(hb.textContent);
+    reveal($('v-' + name), dir);
   }
-  function reveal(view, fadeWhole) {
+  // The page glides in from the side she is heading to, and its cards rise in turn.
+  function reveal(view, dir) {
     if (REDUCED) return;
-    if (fadeWhole) { view.classList.remove('enter'); void view.offsetWidth; view.classList.add('enter') }
+    view.classList.remove('enter-fwd', 'enter-back'); void view.offsetWidth;
+    if (dir) view.classList.add('enter-' + dir);
     view.querySelectorAll('.rv').forEach(function (n, i) {
-      n.style.setProperty('--i', Math.min(i, 14));
+      n.style.setProperty('--i', Math.min(i, 8));
       n.classList.remove('in'); void n.offsetWidth; n.classList.add('in');
     });
     view.querySelectorAll('[data-count]').forEach(countUp);
@@ -720,7 +720,7 @@
     $('remindRow').classList.toggle('on', !!on);
     remindersOn = !!on;
     if (!$('office').hidden) renderStart();
-    $('nudge').hidden = DEMO || on || !PUSH || Notification.permission === 'denied';
+    updateNudge();
     $('chimeRow').hidden = !on || STANDALONE || IOS_TAB;
     updateDot();
   }
@@ -788,7 +788,12 @@
   /* ---------- sign in / out ---------- */
   function showOffice() {
     $('login').hidden = true; $('office').hidden = false;
-    loadAll().then(function () { if (!current) route(); welcome() });
+    $('office').classList.add('loading');
+    loadAll().then(function () {
+      $('office').classList.remove('loading');
+      if (!current) route(); else reveal($('v-' + current));
+      welcome();
+    });
     refreshReminders(); showInstall();
   }
   function showLogin() { $('office').hidden = true; $('login').hidden = false; $('step2').hidden = true; $('step1').hidden = false; $('password').value = ''; closeSheets() }

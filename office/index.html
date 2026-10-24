@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="Agiza Office">
 <title>Agiza Office</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap">
 <style>
 /* Agiza Office: an app-style office. Home shows only what needs her; Diary, Clients and To-dos are one tap away
@@ -76,7 +77,7 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .appbar { position: sticky; top: 0; z-index: 20; height: calc(var(--top-h) + env(safe-area-inset-top, 0px));
   padding: env(safe-area-inset-top, 0px) max(var(--gut-r), calc((100% - 1040px) / 2 + 16px)) 0 max(var(--gut-l), calc((100% - 1040px) / 2 + 16px));
   display: flex; align-items: center; justify-content: space-between; background: rgba(251, 243, 242, .86); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
-  border-bottom: 1px solid transparent; transition: border-color .25s; view-transition-name: appbar }
+  border-bottom: 1px solid transparent; transition: border-color .25s }
 .appbar.scrolled { border-bottom-color: var(--line) }
 .appbar .logo { font-size: 26px }
 .appbar .logo small { font-family: var(--body); font-size: 11px; color: var(--soft); letter-spacing: .16em; text-transform: uppercase; margin-left: 8px; font-weight: 500 }
@@ -86,7 +87,12 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .avatar-btn { position: relative; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--blush); color: var(--rose); font-family: var(--disp); font-weight: 600; font-size: 20px; cursor: pointer }
 .avatar-btn .dot { position: absolute; top: 1px; right: 1px; width: 10px; height: 10px; border-radius: 50%; background: var(--rose); border: 2px solid var(--paper) }
 
-.views { max-width: 1040px; margin: 0 auto; padding: 8px var(--gut-r) calc(var(--bar-h) + 40px + env(safe-area-inset-bottom, 0px)) var(--gut-l); view-transition-name: main }
+#office.loading .views { visibility: hidden }
+#office:not(.loading) .loader { display: none }
+.loader { position: fixed; inset: 0; display: grid; place-items: center; align-content: center; gap: 14px; color: var(--soft); font-size: 14px; pointer-events: none }
+.loader i { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid var(--blush); border-top-color: var(--rose); animation: spin .8s linear infinite }
+@keyframes spin { to { transform: rotate(360deg) } }
+.views { max-width: 1040px; margin: 0 auto; padding: 8px var(--gut-r) calc(var(--bar-h) + 40px + env(safe-area-inset-bottom, 0px)) var(--gut-l) }
 .view { display: grid; gap: 22px; align-content: start }
 .vhead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-top: 10px }
 .vhead h1 { font-family: var(--disp); font-size: clamp(34px, 6vw, 44px); line-height: 1 }
@@ -98,7 +104,7 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 /* bottom tab bar; a left rail on wide screens */
 .tabbar { position: fixed; z-index: 25; left: 0; right: 0; bottom: 0; height: calc(var(--bar-h) + env(safe-area-inset-bottom, 0px));
   padding: 0 var(--gut-r) env(safe-area-inset-bottom, 0px) var(--gut-l); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center;
-  background: rgba(255, 255, 255, .92); backdrop-filter: saturate(1.4) blur(16px); -webkit-backdrop-filter: saturate(1.4) blur(16px); border-top: 1px solid var(--line); view-transition-name: tabbar }
+  background: rgba(255, 255, 255, .92); backdrop-filter: saturate(1.4) blur(16px); -webkit-backdrop-filter: saturate(1.4) blur(16px); border-top: 1px solid var(--line) }
 .tab { display: grid; justify-items: center; gap: 3px; padding: 8px 0; color: var(--soft); text-decoration: none; font-size: 11px; letter-spacing: .02em; position: relative; border: 0; background: none; cursor: pointer }
 .tab .i { transition: transform .3s var(--ease) }
 .tab[aria-current="page"] { color: var(--ink); font-weight: 600 }
@@ -114,19 +120,13 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 
 /* ---------- reveal: cards rise in turn when a page opens ---------- */
 @media (prefers-reduced-motion: no-preference) {
-  .rv.in { animation: rise .6s var(--ease) both; animation-delay: calc(var(--i, 0) * 55ms) }
-  @keyframes rise { from { opacity: 0; transform: translateY(16px) } }
-  ::view-transition-old(main), ::view-transition-new(main) { animation-duration: .42s; animation-timing-function: var(--ease) }
-  html[data-dir="fwd"]::view-transition-old(main) { animation-name: out-left }
-  html[data-dir="fwd"]::view-transition-new(main) { animation-name: in-right }
-  html[data-dir="back"]::view-transition-old(main) { animation-name: out-right }
-  html[data-dir="back"]::view-transition-new(main) { animation-name: in-left }
-  @keyframes out-left { to { opacity: 0; transform: translateX(-32px) } }
-  @keyframes in-right { from { opacity: 0; transform: translateX(40px) } }
-  @keyframes out-right { to { opacity: 0; transform: translateX(32px) } }
-  @keyframes in-left { from { opacity: 0; transform: translateX(-40px) } }
-  .view.enter { animation: viewin .45s var(--ease) both }
-  @keyframes viewin { from { opacity: 0; transform: translateY(10px) } }
+  /* Calm on purpose: the new page glides 14px in the direction of travel; its cards rise 8px in turn. */
+  .rv.in { animation: rise .45s var(--ease) both; animation-delay: calc(var(--i, 0) * 40ms) }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px) } }
+  .view.enter-fwd { animation: infwd .32s var(--ease) both }
+  .view.enter-back { animation: inback .32s var(--ease) both }
+  @keyframes infwd { from { opacity: 0; transform: translateX(14px) } }
+  @keyframes inback { from { opacity: 0; transform: translateX(-14px) } }
 }
 
 /* ---------- Home ---------- */
@@ -508,6 +508,7 @@ dialog.ai { width: min(560px, calc(100% - 32px)) }
     <button class="avatar-btn" id="meBtn" type="button" aria-label="More: reminders, app, news, sign out">A<span class="dot" id="meDot" hidden></span></button></div>
   </header>
 
+  <div class="loader" id="loader" aria-live="polite"><i></i>Opening your office…</div>
   <main class="views" id="views">
     <!-- HOME -->
     <section class="view" id="v-home" aria-label="Home">
@@ -530,7 +531,6 @@ dialog.ai { width: min(560px, calc(100% - 32px)) }
         <div class="start-h"><span class="ring" id="startRing">0/4</span><div><small>Get started</small><h2>Your office in 4 steps</h2></div><button type="button" class="x" id="startX" aria-label="Hide these steps">×</button></div>
         <ol class="steps" id="steps"></ol>
       </section>
-      <button class="chip-nudge rv" id="nudge" type="button" hidden><svg class="i"><use href="#i-bell"/></svg><span>Turn on phone reminders</span>›</button>
       <div class="home-grid">
         <div>
           <div class="next rv" id="nextCard"></div>
@@ -538,6 +538,7 @@ dialog.ai { width: min(560px, calc(100% - 32px)) }
             <div class="sec-h"><h2>Needs you<span class="n" id="needN">0</span></h2></div>
             <div class="stack" id="needList"></div>
           </div>
+          <button class="chip-nudge rv" id="nudge" type="button" hidden><svg class="i"><use href="#i-bell"/></svg><span>Turn on phone reminders</span>›</button>
         </div>
         <div>
           <div class="pulse rv" id="pulse"></div>
@@ -633,8 +634,8 @@ dialog.ai { width: min(560px, calc(100% - 32px)) }
 
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
-<script src="cheer.js?v=6"></script>
-<script src="app.js?v=8"></script>
-<script src="assistant.js?v=9"></script>
+<script src="cheer.js?v=10"></script>
+<script src="app.js?v=10"></script>
+<script src="assistant.js?v=10"></script>
 </body>
 </html>
