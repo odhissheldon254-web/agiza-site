@@ -76,6 +76,10 @@
     $('moodFact').textContent = pick(C.facts, factOffset);
   }
   $('factNext').addEventListener('click', function () { factOffset++; renderMood() });
+  $('moodNext').addEventListener('click', function () {
+    cheerOffset++; renderMood();
+    var p = $('moodCheer'); p.classList.remove('swap'); void p.offsetWidth; p.classList.add('swap');
+  });
   document.addEventListener('agiza:render', renderMood);
 
   /* ---------- celebrations ---------- */

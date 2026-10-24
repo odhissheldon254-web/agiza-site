@@ -70,14 +70,16 @@
     if (s !== 'evening' && fu) parts.push(plural(fu, 'quote is', 'quotes are') + ' waiting for a follow-up.');
     return parts.join(' ');
   }
+  // Home shows one encouraging line; the "Did you know?" fact opens from the 💡 button.
   function renderMood() {
-    $('mood').hidden = false;
-    $('moodLine').textContent = dayLine();
     $('moodCheer').textContent = pick(C.encourage[slot()], cheerOffset);
     $('moodFact').textContent = pick(C.facts, factOffset);
   }
-  $('moodNext').addEventListener('click', function () { cheerOffset++; renderMood() });
   $('factNext').addEventListener('click', function () { factOffset++; renderMood() });
+  $('moodNext').addEventListener('click', function () {
+    cheerOffset++; renderMood();
+    var p = $('moodCheer'); p.classList.remove('swap'); void p.offsetWidth; p.classList.add('swap');
+  });
   document.addEventListener('agiza:render', renderMood);
 
   /* ---------- celebrations ---------- */
@@ -108,16 +110,18 @@
   });
 
   /* ---------- insurance news (filled every few hours by the "news" Edge Function) ---------- */
+  // The latest headline teases on Home; the full list lives in More.
   function loadNews() {
     if (O.DEMO) return;
     O.sb.from('news').select('title,link,source,published_at').order('published_at', { ascending: false }).limit(6)
       .then(function (r) {
         if (r.error || !r.data.length) return;
         newsCache = r.data;
-        $('newsPanel').hidden = false;
+        $('newsTop').textContent = r.data[0].title;
+        $('newsTeaser').hidden = false;
         $('newsList').innerHTML = r.data.map(function (n) {
           var when = n.published_at ? new Date(n.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
-          return '<a class="news" href="' + esc(n.link) + '" target="_blank" rel="noopener"><b>' + esc(n.title) + '</b><small>' +
+          return '<a href="' + esc(n.link) + '" target="_blank" rel="noopener"><b>' + esc(n.title) + '</b><small>' +
             esc([n.source, when].filter(Boolean).join(' · ')) + '</small></a>';
         }).join('');
       });
@@ -401,7 +405,7 @@
       cardEl.classList.add('saved');
       document.dispatchEvent(new CustomEvent('agiza:saved', { detail: { table: c.table, row: c.row, old: c.old || {} } }));
       var extra = c.row.remind_at ? ' I\'ll remind you ' + niceDay(new Date(c.row.remind_at)) + ' at ' + clock(new Date(c.row.remind_at)) + '.' +
-        (remindersOff() ? ' <small>(Turn on reminders at the top of your office to get the alert on this phone.)</small>' : '') : '';
+        (remindersOff() ? ' <small>(Turn on reminders in More: tap your initial at the top.)</small>' : '') : '';
       say(esc(any(C.celebrate.added)) + extra, any(C.celebrate.added).replace(/[^\w\s.!']/g, ''));
     }).catch(function (e2) {
       cardEl.querySelectorAll('button').forEach(function (b) { b.disabled = false });

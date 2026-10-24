@@ -60,6 +60,13 @@ window.AGIZA_CHEER = {
     'People remember stories far better than numbers. Lead with a story, then give the figure.'
   ],
 
+  // Ready-made WhatsApp messages from the Home "Needs you" list. She sees and can edit them in WhatsApp before sending.
+  whatsapp: {
+    followup: 'Hi {name}, it\'s Agiza from Prudential. Just checking in on the quote I sent you. Happy to answer any questions.',
+    hello: 'Hi {name}, it\'s Agiza from Prudential. Lovely to connect! When would be a good time for a quick chat?',
+    docs: 'Hi {name}, it\'s Agiza. A gentle reminder about the documents for your application. Thank you!'
+  },
+
   // Celebrations. {n} is replaced with a number where it makes sense.
   celebrate: {
     covered: [
