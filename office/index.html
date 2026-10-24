@@ -695,8 +695,20 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
       .then(function () { btn.disabled = false; refreshReminders() });
   });
   // Chrome offers installation through this event; keep it for the Install button.
+  // Phones get the bar even before Chrome offers the prompt (it waits until she has used the page a little),
+  // with menu instructions instead of the button. It hides once the office runs as the installed app.
   var installPrompt = window.__installPrompt || null;
-  function showInstall() { $('installBar').hidden = !installPrompt || DEMO }
+  var STANDALONE = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  var PHONE = matchMedia('(pointer: coarse)').matches;
+  function showInstall() {
+    var bar = $('installBar');
+    if (DEMO || STANDALONE || IOS_TAB || (!installPrompt && !PHONE)) { bar.hidden = true; return }
+    bar.hidden = false;
+    $('installBtn').hidden = !installPrompt;
+    bar.querySelector('span').textContent = installPrompt
+      ? '📲 Install Agiza Office on this phone, so it opens like an app.'
+      : '📲 To install Agiza Office as an app: in Chrome, tap ⋮ (top right), then "Install app" or "Add to Home screen", then Install.';
+  }
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); installPrompt = e; showInstall() });
   window.addEventListener('appinstalled', function () { installPrompt = null; showInstall(); toast('Installed. Open Agiza Office from your home screen.') });
   $('installBtn').addEventListener('click', function () {
