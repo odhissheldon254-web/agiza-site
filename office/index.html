@@ -200,14 +200,14 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
           <label for="email">Email address</label>
           <input class="field" id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@gmail.com">
           <p class="err" id="emailErr" hidden></p>
-          <button class="pri" type="submit">Email me a sign-in code</button>
+          <button class="pri" type="submit">Email me a sign-in link</button>
         </form>
-        <p class="hint">No password to remember. We email you a code, and this phone stays signed in.</p>
+        <p class="hint">No password to remember. We email you a link, and this phone stays signed in.</p>
       </div>
       <div id="step2" hidden>
         <div class="rule"></div>
         <h2>Check your email</h2>
-        <p class="sub">We sent a sign-in code to <b id="sentTo"></b>. It expires in an hour.</p>
+        <p class="sub">We emailed <b id="sentTo"></b>. Tap the sign-in link in that email, or type the code if the email shows one. It expires in an hour.</p>
         <form id="codeForm" novalidate>
           <label for="code">Sign-in code</label>
           <input class="field code" id="code" inputmode="numeric" maxlength="10" autocomplete="one-time-code" placeholder="••••••">
@@ -634,7 +634,8 @@ dialog.sheet::backdrop { background: rgba(45,22,48,.45) }
     var go = function () { pendingEmail = v; $('sentTo').textContent = v; $('step1').hidden = true; $('step2').hidden = false; $('code').focus() };
     if (DEMO) return go();
     e.target.classList.add('busy');
-    sb.auth.signInWithOtp({ email: v, options: { shouldCreateUser: false } })
+    // The email carries a link back to this page (and a code, if the template shows one).
+    sb.auth.signInWithOtp({ email: v, options: { shouldCreateUser: false, emailRedirectTo: location.origin + location.pathname } })
       .then(function (r) { if (r.error) throw r.error; go() })
       .catch(function (e2) { errEl.textContent = friendly(e2); errEl.hidden = false })
       .then(function () { e.target.classList.remove('busy') });
