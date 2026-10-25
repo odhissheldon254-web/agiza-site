@@ -761,18 +761,18 @@
     }).catch(function () {});
   }
 
-  /* ---------- the app: Android gets agiza-office.apk (it carries the Agiza chime) ---------- */
+  /* ---------- the app ---------- */
+  // Agiza installed the Android app (with its own chime) from a download that has since been taken down;
+  // a replacement is sent to her directly. Android phones are therefore never offered an install here.
   var installPrompt = window.__installPrompt || null;
   var ANDROID = /Android/i.test(navigator.userAgent);
   var PHONE = matchMedia('(pointer: coarse)').matches;
   function showInstall() {
     var row = $('installRow');
-    if (DEMO || STANDALONE || IOS_TAB || (!installPrompt && !PHONE)) { row.hidden = true; return updateDot() }
+    if (DEMO || STANDALONE || IOS_TAB || ANDROID || (!installPrompt && !PHONE)) { row.hidden = true; return updateDot() }
     row.hidden = false;
-    $('apkLink').hidden = !ANDROID;
-    $('installBtn').hidden = ANDROID || !installPrompt;
-    $('installSub').textContent = ANDROID ? 'Opens like an app, with its own reminder chime. Allow installing from this source if asked.'
-      : installPrompt ? 'Opens like an app from your home screen.' : 'In Chrome: tap ⋮, then "Install app" or "Add to Home screen".';
+    $('installBtn').hidden = !installPrompt;
+    $('installSub').textContent = installPrompt ? 'Opens like an app from your home screen.' : 'In Chrome: tap ⋮, then "Install app" or "Add to Home screen".';
     updateDot();
   }
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); installPrompt = e; showInstall() });
