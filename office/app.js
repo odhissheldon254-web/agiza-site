@@ -203,8 +203,6 @@
     $('hGreet').textContent = (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ', Agiza';
     $('hDate').textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
     renderNext();
-    renderStart();
-    updateNudge();
 
     var list = needs(), shown = showAllNeeds ? list : list.slice(0, 5);
     $('needN').textContent = list.length;
@@ -368,43 +366,11 @@
     $('todoGroups').innerHTML = html;
   }
 
-  /* ---------- first day: welcome, "Get started" steps, import from phone contacts ---------- */
+  /* ---------- first day: welcome, import from phone contacts ---------- */
   function isEmpty() { return !TABLES.some(function (t) { return data[t].length }) }
-  // Small per-phone memory (which steps she has seen); the office works the same without it.
+  // Small per-phone memory (whether she has been welcomed); the office works the same without it.
   function remember(k, v) { try { if (v === undefined) return localStorage.getItem('agiza-' + k); localStorage.setItem('agiza-' + k, v) } catch (_) { return null } }
   var CONTACTS = 'contacts' in navigator && 'ContactsManager' in window;
-  var STEPS = [
-    { k: 'client', t: 'Add your first clients', d: 'Type them in, or pick them from your phone contacts.', done: function () { return data.clients.length > 0 },
-      acts: function () { return '<button type="button" class="act" data-new="clients">Add</button>' + (CONTACTS ? '<button type="button" class="act" data-import>From contacts</button>' : '') } },
-    { k: 'plan', t: 'Plan a meeting or a to-do', d: 'Your next meeting will appear in the dark card above.', done: function () { return data.meetings.length + data.todos.length > 0 },
-      acts: function () { return '<button type="button" class="act" data-new="meetings">Meeting</button><button type="button" class="act" data-new="todos">To-do</button>' } },
-    { k: 'remind', t: 'Turn on phone reminders', d: 'A buzz before meetings and at to-do times.', done: function () { return remindersOn || (!DEMO && !PUSH) },
-      acts: function () { return '<button type="button" class="act" data-more>Turn on</button>' } },
-    { k: 'ask', t: 'Say hi to Ask Agiza', d: 'Try: "Remind me to call Grace tomorrow at 10".', done: function () { return remember('asked') === '1' },
-      acts: function () { return '<button type="button" class="act" data-ask>Try it</button>' } }
-  ];
-  // The reminders nudge shows only once the Get started card (which has the same step) is gone.
-  function updateNudge() { $('nudge').hidden = DEMO || remindersOn || !PUSH || Notification.permission === 'denied' || !$('start').hidden }
-  function renderStart() {
-    var box = $('start');
-    if (remember('start-done') === '1') { box.hidden = true; return }
-    var n = STEPS.filter(function (st) { return st.done() }).length;
-    if (n === STEPS.length) {
-      box.hidden = true;
-      remember('start-done', '1');
-      if (box.dataset.shown && window.AgizaAssistant && AgizaAssistant.celebrate) AgizaAssistant.celebrate('✨ Your office is all set, Agiza. Enjoy it!');
-      return;
-    }
-    box.hidden = false; box.dataset.shown = '1';
-    $('startRing').style.setProperty('--p', n / STEPS.length);
-    $('startRing').textContent = n + '/' + STEPS.length;
-    $('steps').innerHTML = STEPS.map(function (st) {
-      var ok = st.done();
-      return '<li class="' + (ok ? 'ok' : '') + '"><span class="bul">' + (ok ? icon('tick') : '') + '</span><div><b>' + st.t + '</b>' +
-        (ok ? '' : '<small>' + st.d + '</small><span class="sacts">' + st.acts() + '</span>') + '</div></li>';
-    }).join('');
-  }
-  $('startX').addEventListener('click', function () { remember('start-done', '1'); $('start').hidden = true; updateNudge() });
 
   // Pick several people from the phone's contacts and add them as new clients in one go.
   function importContacts() {
@@ -651,8 +617,6 @@
       return;
     }
     if (el.closest('[data-import]')) return importContacts();
-    if (el.closest('[data-more]')) { closeSheets(); return $('moreSheet').showModal() }
-    if (el.closest('[data-ask]')) return $('askBtn').click();
     var tb = el.closest('[data-tick]'); if (tb) return tick(tb);
     var ub = el.closest('[data-untick]');
     if (ub) return api.update('todos', ub.dataset.untick, { done: false }).then(function () { return reload('todos') }).catch(function (e2) { toast(friendly(e2), true) });
@@ -677,9 +641,7 @@
     if (open) { $('factBox').classList.remove('open'); void $('factBox').offsetWidth; $('factBox').classList.add('open') }
   });
   $('addBtn').addEventListener('click', function () { closeSheets(); $('addSheet').showModal() });
-  $('askBtn').addEventListener('click', function () { if (remember('asked') !== '1') { remember('asked', '1'); setTimeout(renderStart, 400) } });
   $('meBtn').addEventListener('click', function () { closeSheets(); $('moreSheet').showModal() });
-  $('nudge').addEventListener('click', function () { $('moreSheet').showModal() });
   $('newsTeaser').addEventListener('click', function () { $('moreSheet').showModal() });
   $('todoQuick').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -719,10 +681,7 @@
     $('remindBtn').hidden = !btn; $('remindBtn').textContent = btn || '';
     $('remindRow').classList.toggle('on', !!on);
     remindersOn = !!on;
-    if (!$('office').hidden) renderStart();
-    updateNudge();
     $('chimeRow').hidden = !on || STANDALONE || IOS_TAB;
-    updateDot();
   }
   // Shows the right message, and re-saves this phone's subscription in case the browser renewed it.
   function refreshReminders() {
@@ -769,11 +728,10 @@
   var PHONE = matchMedia('(pointer: coarse)').matches;
   function showInstall() {
     var row = $('installRow');
-    if (DEMO || STANDALONE || IOS_TAB || ANDROID || (!installPrompt && !PHONE)) { row.hidden = true; return updateDot() }
+    if (DEMO || STANDALONE || IOS_TAB || ANDROID || (!installPrompt && !PHONE)) { row.hidden = true; return }
     row.hidden = false;
     $('installBtn').hidden = !installPrompt;
     $('installSub').textContent = installPrompt ? 'Opens like an app from your home screen.' : 'In Chrome: tap ⋮, then "Install app" or "Add to Home screen".';
-    updateDot();
   }
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); installPrompt = e; showInstall() });
   window.addEventListener('appinstalled', function () { installPrompt = null; showInstall(); toast('Installed. Open Agiza Office from your home screen.') });
@@ -782,8 +740,6 @@
     installPrompt.prompt();
     installPrompt.userChoice.then(function () { installPrompt = null; showInstall() });
   });
-  // A small dot on her initial when something in More wants attention.
-  function updateDot() { $('meDot').hidden = DEMO || (remindersOn || !PUSH) && $('installRow').hidden }
 
   /* ---------- sign in / out ---------- */
   function showOffice() {

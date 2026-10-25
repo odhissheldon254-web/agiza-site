@@ -85,7 +85,6 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .addq { width: 40px; height: 40px; border-radius: 13px; border: 1px solid var(--line); background: var(--card); display: grid; place-items: center; cursor: pointer; transition: transform .2s var(--ease) }
 .addq:active { transform: scale(.93) }
 .avatar-btn { position: relative; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--blush); color: var(--rose); font-family: var(--disp); font-weight: 600; font-size: 20px; cursor: pointer }
-.avatar-btn .dot { position: absolute; top: 1px; right: 1px; width: 10px; height: 10px; border-radius: 50%; background: var(--rose); border: 2px solid var(--paper) }
 
 #office.loading .views { visibility: hidden }
 #office:not(.loading) .loader { display: none }
@@ -152,27 +151,9 @@ label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px }
 .fact .link { justify-self: start; font-size: 13px }
 .fact.open { animation: pop .35s var(--ease) }
 @keyframes pop { from { opacity: 0; transform: translateY(-6px) scale(.98) } }
-.start { padding: 16px 16px 6px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 18px 36px -30px rgba(45, 22, 48, .6) }
-.start-h { display: flex; align-items: center; gap: 12px }
-.start-h div { flex: 1 }
-.start-h small { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--rose); font-weight: 600 }
-.start-h h2 { font-family: var(--disp); font-size: 22px; line-height: 1.1 }
-.start-h .x { border: 0; background: none; font-size: 22px; color: var(--soft); cursor: pointer; padding: 6px 8px; margin: -6px -6px -6px 0 }
-.ring { --p: 0; flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--ink);
-  background: radial-gradient(closest-side, var(--card) 76%, transparent 78% 100%), conic-gradient(var(--c-todo) calc(var(--p) * 100%), var(--blush) 0); transition: --p .6s }
-.steps { list-style: none; margin: 10px 0 0; padding: 0 }
-.steps li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line) }
-.steps .bul { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #dcc3ca; display: grid; place-items: center; margin-top: 1px; color: #fff }
-.steps .bul svg.i { width: 15px; height: 15px; stroke-width: 2.4 }
-.steps li.ok .bul { background: var(--c-todo); border-color: var(--c-todo) }
-.steps li.ok b { color: var(--soft); text-decoration: line-through; font-weight: 400 }
-.steps b { display: block; font-weight: 500 }
-.steps small { display: block; color: var(--soft); font-size: 13px; margin-top: 1px }
-.sacts, .calm-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px }
+.calm-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px }
 .calm-acts { justify-content: center; margin-top: 14px }
 .import { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border-radius: 14px; border: 1px dashed #d9bfc6; background: #fffafb; color: var(--rose); font-weight: 500; cursor: pointer }
-.chip-nudge { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px dashed #e0b9c4; background: #fff7f9; color: var(--rose); font-size: 14px; cursor: pointer; text-align: left }
-.chip-nudge span { flex: 1 }
 
 .next { position: relative; overflow: hidden; border-radius: 22px; padding: 20px 20px 18px; background: var(--ink); color: var(--paper); box-shadow: 0 24px 50px -28px rgba(45, 22, 48, .9) }
 .next::after { content: ""; position: absolute; width: 230px; height: 230px; right: -110px; top: -120px; border-radius: 50%; border: 1px solid rgba(176, 138, 74, .55); pointer-events: none }
@@ -505,7 +486,7 @@ dialog.ai { width: min(560px, calc(100% - 32px)) }
   <header class="appbar" id="appbar">
     <div class="logo">Agiza<i>.</i><small>Office</small></div>
     <div class="right"><button class="addq" id="addBtn" type="button" aria-label="Add something"><svg class="i"><use href="#i-plus"/></svg></button>
-    <button class="avatar-btn" id="meBtn" type="button" aria-label="More: reminders, app, news, sign out">A<span class="dot" id="meDot" hidden></span></button></div>
+    <button class="avatar-btn" id="meBtn" type="button" aria-label="More: reminders, app, news, sign out">A</button></div>
   </header>
 
   <div class="loader" id="loader" aria-live="polite"><i></i>Opening your office…</div>
@@ -526,11 +507,6 @@ dialog.ai { width: min(560px, calc(100% - 32px)) }
         </div>
         <div class="fact" id="factBox" hidden><span id="moodFact"></span><button type="button" class="link" id="factNext">Another fact</button></div>
       </div>
-      <!-- First day: four quick steps, ticked off as she goes; disappears for good when done. -->
-      <section class="start rv" id="start" hidden aria-label="Get started">
-        <div class="start-h"><span class="ring" id="startRing">0/4</span><div><small>Get started</small><h2>Your office in 4 steps</h2></div><button type="button" class="x" id="startX" aria-label="Hide these steps">×</button></div>
-        <ol class="steps" id="steps"></ol>
-      </section>
       <div class="home-grid">
         <div>
           <div class="next rv" id="nextCard"></div>
@@ -538,7 +514,6 @@ dialog.ai { width: min(560px, calc(100% - 32px)) }
             <div class="sec-h"><h2>Needs you<span class="n" id="needN">0</span></h2></div>
             <div class="stack" id="needList"></div>
           </div>
-          <button class="chip-nudge rv" id="nudge" type="button" hidden><svg class="i"><use href="#i-bell"/></svg><span>Turn on phone reminders</span>›</button>
         </div>
         <div>
           <div class="pulse rv" id="pulse"></div>
@@ -635,7 +610,7 @@ dialog.ai { width: min(560px, calc(100% - 32px)) }
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
 <script src="cheer.js?v=10"></script>
-<script src="app.js?v=11"></script>
+<script src="app.js?v=12"></script>
 <script src="assistant.js?v=10"></script>
 </body>
 </html>
