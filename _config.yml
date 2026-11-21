@@ -1,2 +1,4 @@
 # GitHub Pages skips dot-folders unless listed; Android reads .well-known/assetlinks.json to trust the Agiza Office app.
 include: [".well-known"]
+# Notes for maintainers only; not served on the website.
+exclude: ["README.md"]
